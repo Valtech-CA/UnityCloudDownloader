@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>noun_Cloud_1421729_000000.svg</file>
+        <file>noun_Gear_577581_000000.svg</file>
+        <file>unity-3d-vector-icon-logo.svg</file>
+        <file>unitycloudlogo.ico</file>
+        <file>UnityCloudLogo.png</file>
+        <file>UnityCloudLogo.svg</file>
+        <file>UnityCloudLogo2.png</file>
+        <file>UnityCloudLogo2.svg</file>
+    </qresource>
+</RCC>

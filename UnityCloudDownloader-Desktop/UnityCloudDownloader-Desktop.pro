@@ -4,12 +4,14 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = UnityCloundDownloader-Desktop
 TEMPLATE = app
+
+win32:RC_FILE = UnityCloudDownloader.rc
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -25,16 +27,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp
+    src/main.cpp \
+    src/systemtrayicon.cpp
 
 HEADERS += \
-        mainwindow.h
+    src/systemtrayicon.h
 
-FORMS += \
-        mainwindow.ui
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    icons/icons.qrc
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../UnityCloudDownloader-Core/release/ -lUnityCloudDownloader-Core
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../UnityCloudDownloader-Core/debug/ -lUnityCloudDownloader-Core
+else:unix: LIBS += -L$$OUT_PWD/../UnityCloudDownloader-Core/ -lUnityCloudDownloader-Core
+
+INCLUDEPATH += $$PWD/../UnityCloudDownloader-Core/includes
+DEPENDPATH += $$PWD/../UnityCloudDownloader-Core

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += network
+QT       += network sql
 
 QT       -= gui
 
@@ -24,12 +24,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+INCLUDEPATH += includes
+
 SOURCES += \
-        unityclouddownloadercore.cpp
+    src/profile.cpp \
+    src/buildtarget.cpp \
+    src/project.cpp \
+    src/unityclouddownloadercore.cpp
 
 HEADERS += \
-        unityclouddownloadercore.h \
-        unityclouddownloader-core_global.h
+    includes/unityclouddownloader-core_global.h \
+    includes/profile.h \
+    includes/project.h \
+    includes/buildtarget.h \
+    includes/unityclouddownloadercore.h
 
 unix {
     target.path = /usr/lib
