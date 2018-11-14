@@ -11,6 +11,7 @@
 namespace ucd
 {
 
+class ProfileDao;
 class DatabasePrivate;
 
 class UCD_SHARED_EXPORT Database : public QObject
@@ -22,6 +23,8 @@ public:
     ~Database();
 
     void init();
+
+    ProfileDao profiles();
 
 private:
     std::unique_ptr<DatabasePrivate> p;

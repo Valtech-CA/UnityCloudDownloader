@@ -101,7 +101,7 @@ QDataStream &operator>>(QDataStream &in, ucd::BuildTargetList &dest)
 
 QDataStream &operator<<(QDataStream &out, const ucd::Project &value)
 {
-    out << value.name() << value.id() << value.organisationId() << value.iconPath() << value.buildTargets();
+    out << value.name() << value.id() << value.profileId() << value.organisationId() << value.iconPath() << value.buildTargets();
     return out;
 }
 
@@ -111,6 +111,8 @@ QDataStream &operator>>(QDataStream &in, ucd::Project &dest)
     in >> name;
     QString id;
     in >> id;
+    QString profileId;
+    in >> profileId;
     QString orgId;
     in >> orgId;
     QString iconPath;
@@ -120,6 +122,7 @@ QDataStream &operator>>(QDataStream &in, ucd::Project &dest)
 
     dest.setName(name);
     dest.setId(id);
+    dest.setProfileId(profileId);
     dest.setOrganisationId(orgId);
     dest.setIconPath(iconPath);
     dest.setBuildTargets(buildTargetList);
