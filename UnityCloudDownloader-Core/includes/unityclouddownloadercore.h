@@ -1,10 +1,12 @@
 #ifndef UCD_CORE_H
 #define UCD_CORE_H
 
+#include "unityclouddownloader-core_global.h"
+
 namespace ucd
 {
 
-class Core
+class UCD_SHARED_EXPORT Core
 {
 public:
     Core() = delete;

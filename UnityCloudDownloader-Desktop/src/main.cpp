@@ -1,13 +1,23 @@
 #include "systemtrayicon.h"
 
+#include "unityclouddownloadercore.h"
+#include "profile.h"
+
 #include <QApplication>
 #include <QSystemTrayIcon>
 #include <QMessageBox>
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QCoreApplication::setOrganizationName("Valtech");
+    QCoreApplication::setOrganizationDomain("valtech.com");
+    QCoreApplication::setApplicationName("UnityCloudDownloader");
+
+    ucd::Core::init();
+
     QApplication a(argc, argv);
-    QApplication::setQuitOnLastWindowClosed(true);
+    QApplication::setQuitOnLastWindowClosed(false);
 
     if (!QSystemTrayIcon::isSystemTrayAvailable())
     {
@@ -17,10 +27,6 @@ int main(int argc, char *argv[])
                 QObject::tr("Couldn't detect any system tray on this system."));
         return 1;
     }
-
-    QCoreApplication::setOrganizationName("Valtech");
-    QCoreApplication::setOrganizationDomain("valtech.com");
-    QCoreApplication::setApplicationName("UnityCloudDownloader");
 
     SystemTrayIcon trayIcon;
     trayIcon.show();
