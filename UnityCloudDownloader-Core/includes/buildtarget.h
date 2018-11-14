@@ -24,15 +24,21 @@ public:
 
     const QString& name() const { return m_name; }
     const QString& id() const { return m_id; }
+    const QString& profileId() const { return m_profileId; }
+    const QString& projectId() const { return m_projectId; }
     const QString& platform() const { return m_platform; }
 
     void setName(const QString &name);
     void setId(const QString &id);
+    void setProfileId(const QString &profileId);
+    void setProjectId(const QString &projectId);
     void setPlatform(const QString &platform);
 
 private:
-    QString m_name;
     QString m_id;
+    QString m_profileId;
+    QString m_projectId;
+    QString m_name;
     QString m_platform;
 };
 

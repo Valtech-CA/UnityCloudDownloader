@@ -5,6 +5,7 @@ StackView {
     id: mainStack
     width: 640
     height: 480
+    anchors.fill: parent
     visible: true
 
     initialItem: ProfileList {}

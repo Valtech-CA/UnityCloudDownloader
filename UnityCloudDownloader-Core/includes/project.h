@@ -27,19 +27,22 @@ public:
 
     const QString& name() const { return m_name; }
     const QString& id() const { return m_id; }
+    const QString& profileId() const { return m_profileId; }
     const QString& organisationId() const { return m_orgId; }
     const QString& iconPath() const { return m_iconPath; }
     const BuildTargetList& buildTargets() const { return m_buildTargets; }
 
     void setName(const QString &name);
     void setId(const QString &id);
+    void setProfileId(const QString &profileId);
     void setOrganisationId(const QString &id);
     void setIconPath(const QString &iconPath);
     void setBuildTargets(const BuildTargetList &buildTargets);
 
 private:
-    QString m_name;
     QString m_id;
+    QString m_profileId;
+    QString m_name;
     QString m_orgId;
     QString m_iconPath;
     BuildTargetList m_buildTargets;

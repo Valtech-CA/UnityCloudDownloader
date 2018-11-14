@@ -9,16 +9,18 @@ Project::Project()
 {}
 
 Project::Project(const Project &other)
-    : m_name(other.m_name)
-    , m_id(other.m_id)
+    : m_id(other.m_id)
+    , m_profileId(other.m_profileId)
+    , m_name(other.m_name)
     , m_orgId(other.m_orgId)
     , m_iconPath(other.m_iconPath)
     , m_buildTargets(other.m_buildTargets)
 {}
 
 Project::Project(Project &&other)
-    : m_name(std::move(other.m_name))
-    , m_id(std::move(other.m_id))
+    : m_id(std::move(other.m_id))
+    , m_profileId(std::move(other.m_profileId))
+    , m_name(std::move(other.m_name))
     , m_orgId(std::move(other.m_orgId))
     , m_iconPath(std::move(other.m_iconPath))
     , m_buildTargets(std::move(other.m_buildTargets))
@@ -47,6 +49,11 @@ void Project::setName(const QString &name)
 void Project::setId(const QString &id)
 {
     m_id = id;
+}
+
+void Project::setProfileId(const QString &profileId)
+{
+    m_profileId = profileId;
 }
 
 void Project::setOrganisationId(const QString &id)

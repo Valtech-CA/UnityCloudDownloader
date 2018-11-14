@@ -6,8 +6,9 @@
 #include <QQmlApplicationEngine>
 #include <QQuickView>
 
-SystemTrayIcon::SystemTrayIcon(QObject *parent)
+SystemTrayIcon::SystemTrayIcon(ucd::Database *data, QObject *parent)
     : QSystemTrayIcon(parent)
+    , m_db(data)
     , m_menu(nullptr)
     , m_quitAction(nullptr)
     , m_qmlEngine(nullptr)
@@ -27,7 +28,6 @@ SystemTrayIcon::SystemTrayIcon(QObject *parent)
     setContextMenu(m_menu);
     setToolTip(tr("Unity Cloud Downloader"));
     setIcon(QIcon(":/icons/UnityCloudLogo2.png"));
-
 }
 
 SystemTrayIcon::~SystemTrayIcon()
@@ -47,6 +47,8 @@ void SystemTrayIcon::onConfigure()
         m_view = new QQuickView(m_qmlEngine, nullptr);
         m_view->setTitle(tr("Unity Cloud Downloader"));
         m_view->setSource(QUrl("qrc:/views/main.qml"));
+        m_view->setWidth(600);
+        m_view->setHeight(800);
         m_view->show();
     }
     else
