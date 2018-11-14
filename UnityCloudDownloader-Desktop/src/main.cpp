@@ -1,11 +1,15 @@
 #include "systemtrayicon.h"
 
 #include "unityclouddownloadercore.h"
-#include "profile.h"
+#include "database.h"
 
 #include <QApplication>
 #include <QSystemTrayIcon>
 #include <QMessageBox>
+#include <QStandardPaths>
+#include <QDir>
+
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
@@ -27,6 +31,17 @@ int main(int argc, char *argv[])
                 QObject::tr("Couldn't detect any system tray on this system."));
         return 1;
     }
+
+    auto configPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QDir configDir(configPath);
+    if (!configDir.exists())
+    {
+        configDir.mkpath(configPath);
+    }
+    auto configFilePath = configDir.filePath("data.sqlite");
+
+    ucd::Database database(configFilePath);
+    database.init();
 
     SystemTrayIcon trayIcon;
     trayIcon.show();

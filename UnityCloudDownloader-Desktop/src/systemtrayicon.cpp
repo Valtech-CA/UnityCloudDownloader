@@ -11,6 +11,7 @@ SystemTrayIcon::SystemTrayIcon(QObject *parent)
     , m_menu(nullptr)
     , m_quitAction(nullptr)
     , m_qmlEngine(nullptr)
+    , m_view(nullptr)
 {
     m_quitAction = new QAction(tr("&Quit"), this);
     connect(m_quitAction, &QAction::triggered, qApp, &QApplication::quit, Qt::QueuedConnection);

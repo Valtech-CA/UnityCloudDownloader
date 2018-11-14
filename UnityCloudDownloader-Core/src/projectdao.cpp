@@ -13,7 +13,7 @@ ProjectDao::ProjectDao(QSqlDatabase &database)
 void ProjectDao::init()
 {
     QSqlQuery query(m_db);
-    query.exec("CREATE TABLE IF NOT EXISTS Projects (profileId TEXT, id TEXT, name TEXT, orgId TEXT, iconPath TEXT, PRIMARY KEY (profileId, id))");
+    query.exec("CREATE TABLE IF NOT EXISTS Projects (profileId TEXT, projectId TEXT, name TEXT, orgId TEXT, iconPath TEXT, PRIMARY KEY (profileId, id))");
 }
 
 }
