@@ -2,8 +2,8 @@
 #define UCD_PROFILEDAO_H
 
 #include <QVector>
+#include <QSqlDatabase>
 
-class QSqlDatabase;
 class QUuid;
 
 namespace ucd
@@ -14,7 +14,8 @@ class Profile;
 class ProfileDao
 {
 public:
-    ProfileDao(QSqlDatabase &database);
+    ProfileDao(QSqlDatabase &&database);
+    ProfileDao(const QSqlDatabase &databse);
 
     void init();
 
@@ -24,7 +25,7 @@ public:
     QVector<Profile> profiles(bool includeProjects = false);
 
 private:
-    QSqlDatabase &m_db;
+    QSqlDatabase m_db;
 };
 
 }

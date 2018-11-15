@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += network sql
+QT       += network sql concurrent
 
 QT       -= gui
 
@@ -37,7 +37,8 @@ SOURCES += \
     src/profiledao.cpp \
     src/database.cpp \
     src/projectdao.cpp \
-    src/buildtargetdao.cpp
+    src/buildtargetdao.cpp \
+    src/unityapiclient.cpp
 
 HEADERS += \
     includes/unityclouddownloader-core_global.h \
@@ -49,7 +50,8 @@ HEADERS += \
     src/profiledao.h \
     includes/database.h \
     src/projectdao.h \
-    src/buildtargetdao.h
+    src/buildtargetdao.h \
+    includes/unityapiclient.h
 
 unix {
     target.path = /usr/lib

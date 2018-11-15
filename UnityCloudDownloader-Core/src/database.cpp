@@ -43,9 +43,9 @@ void Database::init()
     BuildTargetDao(database).init();
 }
 
-ProfileDao Database::profiles()
+QSqlDatabase Database::sqlDatabase()
 {
-    return ProfileDao{QSqlDatabase::database(p->connectionName)};
+    return QSqlDatabase::database(p->connectionName);
 }
 
 }

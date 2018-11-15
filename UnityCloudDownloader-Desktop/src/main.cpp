@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     ucd::Core::init();
 
     QApplication a(argc, argv);
-    QApplication::setQuitOnLastWindowClosed(false);
+    QApplication::setQuitOnLastWindowClosed(true);
 
     if (!QSystemTrayIcon::isSystemTrayAvailable())
     {
@@ -43,8 +43,10 @@ int main(int argc, char *argv[])
     ucd::Database database(configFilePath);
     database.init();
 
-    SystemTrayIcon trayIcon;
+    SystemTrayIcon trayIcon(&database);
     trayIcon.show();
+
+    QMetaObject::invokeMethod(&trayIcon, "onConfigure");
 
     return a.exec();
 }

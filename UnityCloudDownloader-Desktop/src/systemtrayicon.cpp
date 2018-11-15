@@ -1,10 +1,14 @@
 #include "systemtrayicon.h"
 
+#include "unityapiclient.h"
+#include "profilemodel.h"
+
 #include <QApplication>
 #include <QMenu>
 #include <QAction>
 #include <QQmlApplicationEngine>
 #include <QQuickView>
+#include <QQmlContext>
 
 SystemTrayIcon::SystemTrayIcon(ucd::Database *data, QObject *parent)
     : QSystemTrayIcon(parent)
@@ -43,7 +47,11 @@ void SystemTrayIcon::onConfigure()
 {
     if (m_qmlEngine == nullptr)
     {
+        auto *unityApiClient = new ucd::UnityApiClient(this);
+        auto *profileModel = new ucd::ProfilesModel(m_db, this);
         m_qmlEngine = new QQmlApplicationEngine(this);
+        m_qmlEngine->rootContext()->setContextProperty("unityClient", unityApiClient);
+        m_qmlEngine->rootContext()->setContextProperty("profileModel", profileModel);
         m_view = new QQuickView(m_qmlEngine, nullptr);
         m_view->setTitle(tr("Unity Cloud Downloader"));
         m_view->setSource(QUrl("qrc:/views/main.qml"));

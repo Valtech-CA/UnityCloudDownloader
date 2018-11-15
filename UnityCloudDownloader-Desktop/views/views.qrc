@@ -6,5 +6,6 @@
         <file>main.qml</file>
         <file>ProfileList.qml</file>
         <file>ProfileDelegate.qml</file>
+        <file>AddProfile.qml</file>
     </qresource>
 </RCC>

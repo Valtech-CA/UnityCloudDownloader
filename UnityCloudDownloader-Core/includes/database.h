@@ -7,11 +7,11 @@
 
 #include <QObject>
 
+class QSqlDatabase;
 
 namespace ucd
 {
 
-class ProfileDao;
 class DatabasePrivate;
 
 class UCD_SHARED_EXPORT Database : public QObject
@@ -24,7 +24,7 @@ public:
 
     void init();
 
-    ProfileDao profiles();
+    QSqlDatabase sqlDatabase();
 
 private:
     std::unique_ptr<DatabasePrivate> p;
