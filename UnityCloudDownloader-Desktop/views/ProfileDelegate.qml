@@ -1,5 +1,6 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.2
+import QtQuick.Controls.Material 2.3
 import "qrc:/views"
 
 Item {
@@ -25,6 +26,7 @@ Item {
             id: nameText
             text: name
             font.pointSize: 24
+            color: Material.foreground
         }
 
         Text {
@@ -32,6 +34,7 @@ Item {
             text: rootPath
             font.italic: true
             font.pointSize: 14
+            color: Material.foreground
         }
     }
 

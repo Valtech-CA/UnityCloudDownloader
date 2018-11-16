@@ -2,6 +2,7 @@ import QtQuick 2.9
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import QtQuick.Dialogs 1.2
+import QtQuick.Controls.Material 2.3
 
 Page {
     id: addProfilePage
@@ -16,6 +17,7 @@ Page {
 
             Button {
                 text: qsTr("Back")
+                Layout.minimumWidth: 120
                 Layout.rightMargin: 10
                 onClicked: {
                     mainStack.pop()
@@ -25,8 +27,7 @@ Page {
     }
 
     Text {
-        x: 309
-        color: "#cccccc"
+        color: Material.foreground
         text: qsTr("Add New Profile")
         anchors.top: parent.top
         anchors.topMargin: 20
@@ -48,7 +49,7 @@ Page {
         columnSpacing: 10
 
         Text {
-            color: "#cccccc"
+            color: Material.foreground
             text: qsTr("Name")
             font.pointSize: 16
             Layout.alignment: Qt.AlignRight
@@ -62,7 +63,7 @@ Page {
         }
 
         Text {
-            color: "#cccccc"
+            color: Material.foreground
             text: qsTr("Api Key")
             font.pointSize: 16
             Layout.alignment: Qt.AlignRight
@@ -80,7 +81,7 @@ Page {
             }
 
             onTextEdited: {
-                apiField.color = "#cccccc"
+                apiField.color = Material.foreground
                 testApiTimer.restart()
             }
 
@@ -110,7 +111,7 @@ Page {
         }
 
         Text {
-            color: "#cccccc"
+            color: Material.foreground
             text: qsTr("Rooth Path")
             font.pointSize: 16
             Layout.alignment: Qt.AlignRight
@@ -134,6 +135,7 @@ Page {
             text: qsTr("Add")
             Layout.columnSpan: 2
             Layout.alignment: Qt.AlignHCenter
+            Layout.minimumWidth: 120
             enabled: nameField.isValid && apiField.isValid && pathField.isValid
 
             onClicked: {

@@ -9,6 +9,8 @@ Page {
     footer: ToolBar {
         RowLayout {
             anchors.fill: parent
+            spacing: 8
+
             Button {
                 id: addButton
                 text: qsTr("Add")
