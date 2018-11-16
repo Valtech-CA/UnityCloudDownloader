@@ -5,10 +5,11 @@ import "qrc:/views"
 
 Item {
     id: profileDelegate
-    width: parent.width
     height: 120
+    width: parent.width
 
     MouseArea {
+        id: mouseArea
         anchors.fill: parent
         onClicked: {
             profileDelegate.ListView.view.currentIndex = index
@@ -36,6 +37,15 @@ Item {
             font.pointSize: 14
             color: Material.foreground
         }
+    }
+
+    ArrowButton {
+        id: arrow
+        width: 80
+        height: 80
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: 30
     }
 
 }

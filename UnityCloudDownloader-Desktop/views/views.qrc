@@ -7,5 +7,7 @@
         <file>ProfileList.qml</file>
         <file>ProfileDelegate.qml</file>
         <file>AddProfile.qml</file>
+        <file>angle_right.png</file>
+        <file>ArrowButton.qml</file>
     </qresource>
 </RCC>
