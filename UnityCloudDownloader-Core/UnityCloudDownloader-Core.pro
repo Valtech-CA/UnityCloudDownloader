@@ -33,12 +33,13 @@ SOURCES += \
     src/buildtarget.cpp \
     src/project.cpp \
     src/unityclouddownloadercore.cpp \
-    src/profilemodel.cpp \
     src/profiledao.cpp \
     src/database.cpp \
     src/projectdao.cpp \
     src/buildtargetdao.cpp \
-    src/unityapiclient.cpp
+    src/unityapiclient.cpp \
+    src/projectsmodel.cpp \
+    src/profilesmodel.cpp
 
 HEADERS += \
     includes/unityclouddownloader-core_global.h \
@@ -46,12 +47,13 @@ HEADERS += \
     includes/project.h \
     includes/buildtarget.h \
     includes/unityclouddownloadercore.h \
-    includes/profilemodel.h \
     src/profiledao.h \
     includes/database.h \
     src/projectdao.h \
     src/buildtargetdao.h \
-    includes/unityapiclient.h
+    includes/unityapiclient.h \
+    includes/projectsmodel.h \
+    includes/profilesmodel.h
 
 unix {
     target.path = /usr/lib

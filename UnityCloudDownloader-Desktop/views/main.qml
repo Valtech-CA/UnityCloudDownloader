@@ -5,6 +5,7 @@ import "."
 
 Window {
     id: mainWindow
+    title: qsTr("Unity Cloud Downloader")
     width: 600
     height: 800
     visible: true

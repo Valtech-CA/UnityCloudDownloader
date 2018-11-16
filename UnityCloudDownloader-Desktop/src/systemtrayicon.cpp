@@ -4,7 +4,7 @@
 
 #include "database.h"
 #include "unityapiclient.h"
-#include "profilemodel.h"
+#include "profilesmodel.h"
 
 #include <QApplication>
 #include <QMenu>

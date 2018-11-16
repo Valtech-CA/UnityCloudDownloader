@@ -1,4 +1,4 @@
-#include "profilemodel.h"
+#include "profilesmodel.h"
 
 #include "profile.h"
 #include "profiledao.h"
