@@ -9,6 +9,11 @@
 namespace ucd
 {
 
+ProfilesModel::ProfilesModel(QObject *parent)
+    : QAbstractListModel(parent)
+{
+}
+
 ProfilesModel::ProfilesModel(Database *data, QObject *parent)
     : QAbstractListModel(parent)
     , m_db(data)
@@ -18,6 +23,25 @@ ProfilesModel::ProfilesModel(Database *data, QObject *parent)
 
 ProfilesModel::~ProfilesModel()
 {}
+
+void ProfilesModel::setDatabase(Database *database)
+{
+    if (database == m_db)
+        return;
+
+    beginResetModel();
+    m_db = database;
+    if (m_db != nullptr)
+    {
+        m_profiles = ProfileDao(m_db->sqlDatabase()).profiles();
+    }
+    else
+    {
+        m_profiles.clear();
+    }
+    endResetModel();
+    emit databaseChanged(database);
+}
 
 QModelIndex ProfilesModel::createProfile(const QString &name, const QString &apiKey, const QString &rootPath)
 {

@@ -2,6 +2,7 @@
 
 #include "qmlcontext.h"
 
+#include "database.h"
 #include "unityapiclient.h"
 #include "profilemodel.h"
 
@@ -9,7 +10,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QQmlApplicationEngine>
-#include <QQuickView>
+#include <QQuickWindow>
 #include <QQmlContext>
 
 SystemTrayIcon::SystemTrayIcon(ucd::Database *data, QObject *parent)
@@ -18,7 +19,7 @@ SystemTrayIcon::SystemTrayIcon(ucd::Database *data, QObject *parent)
     , m_menu(nullptr)
     , m_quitAction(nullptr)
     , m_qmlEngine(nullptr)
-    , m_view(nullptr)
+    , m_window(nullptr)
 {
     m_quitAction = new QAction(tr("&Quit"), this);
     connect(m_quitAction, &QAction::triggered, qApp, &QApplication::quit, Qt::QueuedConnection);
@@ -38,11 +39,6 @@ SystemTrayIcon::SystemTrayIcon(ucd::Database *data, QObject *parent)
 
 SystemTrayIcon::~SystemTrayIcon()
 {
-    if (m_view != nullptr)
-    {
-        m_view->destroy();
-        m_view = nullptr;
-    }
 }
 
 void SystemTrayIcon::onConfigure()
@@ -51,20 +47,17 @@ void SystemTrayIcon::onConfigure()
     {
         auto *qmlContext = new QmlContext(this);
         auto *unityApiClient = new ucd::UnityApiClient(this);
-        auto *profileModel = new ucd::ProfilesModel(m_db, this);
+        qmlRegisterType<ucd::Database>();
+        qmlRegisterType<ucd::ProfilesModel>("ucd", 1, 0, "ProfilesModel");
         m_qmlEngine = new QQmlApplicationEngine(this);
         m_qmlEngine->rootContext()->setContextObject(qmlContext);
+        m_qmlEngine->rootContext()->setContextProperty("ucdDb", m_db);
         m_qmlEngine->rootContext()->setContextProperty("unityClient", unityApiClient);
-        m_qmlEngine->rootContext()->setContextProperty("profileModel", profileModel);
-        m_view = new QQuickView(m_qmlEngine, nullptr);
-        m_view->setTitle(tr("Unity Cloud Downloader"));
-        m_view->setSource(QUrl("qrc:/views/main.qml"));
-        m_view->setWidth(600);
-        m_view->setHeight(800);
-        m_view->show();
+        m_qmlEngine->load(QUrl("qrc:/views/main.qml"));
+        m_window = qobject_cast<QQuickWindow*>(m_qmlEngine->rootObjects().first());
     }
     else
     {
-        m_view->show();
+        m_window->show();
     }
 }

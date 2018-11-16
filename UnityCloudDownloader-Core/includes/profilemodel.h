@@ -17,6 +17,7 @@ class Database;
 class UCD_SHARED_EXPORT ProfilesModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(ucd::Database* database READ database WRITE setDatabase NOTIFY databaseChanged)
 public:
     enum Roles : int
     {
@@ -26,8 +27,12 @@ public:
         ApiKey,
     };
 
+    explicit ProfilesModel(QObject *parent = nullptr);
     explicit ProfilesModel(Database *data, QObject *parent = nullptr);
     virtual ~ProfilesModel() override;
+
+    Database* database() const { return m_db; }
+    void setDatabase(Database *database);
 
     Q_INVOKABLE QModelIndex createProfile(const QString &name, const QString &apiKey, const QString &rootPath);
     QModelIndex addProfile(const Profile &profile);
@@ -40,6 +45,9 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent) override;
     QHash<int, QByteArray> roleNames() const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+signals:
+    void databaseChanged(Database *);
 
 private:
     bool isIndexValid(const QModelIndex &index) const;

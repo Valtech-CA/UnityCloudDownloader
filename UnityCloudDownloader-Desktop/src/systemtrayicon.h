@@ -11,6 +11,7 @@ class Database;
 class QAction;
 class QQmlApplicationEngine;
 class QQuickView;
+class QQuickWindow;
 
 class SystemTrayIcon : public QSystemTrayIcon
 {
@@ -28,6 +29,7 @@ private:
     QMenu *m_menu;
     QAction *m_quitAction;
     QQmlApplicationEngine *m_qmlEngine;
+    QQuickWindow *m_window;
     QQuickView *m_view;
 };
 

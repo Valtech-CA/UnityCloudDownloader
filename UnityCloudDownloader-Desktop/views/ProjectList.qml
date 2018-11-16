@@ -2,6 +2,7 @@ import QtQuick 2.9
 import QtQuick.Controls 2.3
 import QtQuick.Controls.Material 2.0
 import QtQuick.Layouts 1.3
+import ucd 1.0
 
 Page {
     id: projectList
@@ -30,7 +31,10 @@ Page {
     ListView {
         id: projectListView
         anchors.fill: parent
-        model: profileModel
+        model: ProfilesModel {
+            database: ucdDb
+        }
+
         delegate: ProfileDelegate {
             width: parent.width
         }

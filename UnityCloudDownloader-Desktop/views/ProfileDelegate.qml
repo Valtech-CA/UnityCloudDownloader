@@ -7,6 +7,16 @@ Item {
     height: 120
     width: 400
 
+    Rectangle {
+        id: rect
+        anchors.fill: parent
+        anchors.margins: 4
+        color: "transparent"
+        border.color: Material.color(Material.Grey)
+        border.width: 2
+        radius: 10
+    }
+
     MouseArea {
         id: mouseArea
         anchors.fill: parent
@@ -51,9 +61,5 @@ Item {
         }
     }
 
-}
 
-/*##^## Designer {
-    D{i:4;anchors_height:400;anchors_width:200;anchors_x:8;anchors_y:8}
 }
- ##^##*/
