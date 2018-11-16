@@ -38,7 +38,9 @@ Page {
         id: profileListView
         anchors.fill: parent
         model: profileModel
-        delegate: ProfileDelegate {}
+        delegate: ProfileDelegate {
+            width: parent.width
+        }
         currentIndex: -1
     }
 }

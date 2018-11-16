@@ -6,7 +6,7 @@ import "qrc:/views"
 Item {
     id: profileDelegate
     height: 120
-    width: parent.width
+    width: 200
 
     MouseArea {
         id: mouseArea
@@ -46,6 +46,10 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: 30
+
+        onClicked: {
+            mainStack.push("qrc:/views/ProjectList.qml", {"profileId": id})
+        }
     }
 
 }

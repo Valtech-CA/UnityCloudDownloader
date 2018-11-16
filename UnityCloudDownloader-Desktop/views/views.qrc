@@ -9,5 +9,6 @@
         <file>AddProfile.qml</file>
         <file>angle_right.png</file>
         <file>ArrowButton.qml</file>
+        <file>ProjectList.qml</file>
     </qresource>
 </RCC>
