@@ -2,10 +2,17 @@ import QtQuick 2.9
 import QtQuick.Controls 2.2
 import "qrc:/views"
 
-Rectangle {
+Item {
     id: profileDelegate
     width: parent.width
     height: 120
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            profileDelegate.ListView.view.currentIndex = index
+        }
+    }
 
     Column {
         id: column
@@ -22,12 +29,11 @@ Rectangle {
 
         Text {
             id: pathText
-            text: roothPath
+            text: rootPath
             font.italic: true
             font.pointSize: 14
         }
     }
-
 
 }
 

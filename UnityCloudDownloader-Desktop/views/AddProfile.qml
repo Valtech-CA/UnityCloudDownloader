@@ -1,6 +1,7 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
+import QtQuick.Dialogs 1.2
 
 Page {
     id: addProfilePage
@@ -57,6 +58,7 @@ Page {
             id: nameField
             placeholderText: qsTr("Profile Name")
             Layout.fillWidth: true
+            property bool isValid: !!text
         }
 
         Text {
@@ -95,7 +97,7 @@ Page {
             Connections {
                 target: unityClient
                 onKeyTested: {
-                    if (apiField.text == apiKey) {
+                    if (apiField.text === apiKey) {
                         apiField.isValid = isValid
                         if (isValid) {
                             apiField.color = "#33cc33"
@@ -117,13 +119,27 @@ Page {
         TextField {
             id: pathField
             placeholderText: qsTr("Root Directory")
+            readOnly: true
             Layout.fillWidth: true
+
+            property bool isValid: !!text
+
+            onPressed: {
+                folderDialog.visible = true
+            }
         }
 
-        Item {
-            id: status
+        Button {
+            id: nextButton
+            text: qsTr("Add")
             Layout.columnSpan: 2
-            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
+            enabled: nameField.isValid && apiField.isValid && pathField.isValid
+
+            onClicked: {
+                profileModel.createProfile(nameField.text, apiField.text, pathField.text)
+                mainStack.pop()
+            }
         }
 
         Item {
@@ -132,6 +148,17 @@ Page {
             Layout.fillHeight: true
         }
 
+    }
+
+    FileDialog {
+        id: folderDialog
+        title: qsTr("Choose a root folder")
+        selectFolder: true
+        folder: shortcuts.documents
+
+        onAccepted: {
+            pathField.text = urlToPath(folderDialog.fileUrl)
+        }
     }
 
 }

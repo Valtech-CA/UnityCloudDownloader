@@ -28,10 +28,12 @@ CONFIG += c++1z
 
 SOURCES += \
     src/main.cpp \
-    src/systemtrayicon.cpp
+    src/systemtrayicon.cpp \
+    src/qmlcontext.cpp
 
 HEADERS += \
-    src/systemtrayicon.h
+    src/systemtrayicon.h \
+    src/qmlcontext.h
 
 FORMS +=
 

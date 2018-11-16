@@ -24,6 +24,10 @@ Page {
                 text: qsTr("Remove")
                 Layout.fillWidth: true
                 Layout.rightMargin: 10
+                enabled: profileListView.currentIndex !== -1
+                onClicked: {
+                    profileModel.remove(profileListView.currentIndex)
+                }
             }
         }
     }
@@ -33,5 +37,10 @@ Page {
         anchors.fill: parent
         model: profileModel
         delegate: ProfileDelegate {}
+
+        Component.onCompleted: {
+            profileListView.currentIndex = -1
+            console.log(profileListView.currentIndex)
+        }
     }
 }

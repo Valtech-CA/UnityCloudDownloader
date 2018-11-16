@@ -37,6 +37,11 @@ QModelIndex ProfilesModel::addProfile(const Profile &profile)
     return index(m_profiles.count() - 1);
 }
 
+bool ProfilesModel::remove(int index, int count)
+{
+    return removeRows(index, count, QModelIndex());
+}
+
 int ProfilesModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
@@ -98,7 +103,7 @@ bool ProfilesModel::setData(const QModelIndex &index, const QVariant &value, int
 bool ProfilesModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     Q_UNUSED(parent);
-    if (row + count >= m_profiles.count())
+    if (row + count > m_profiles.count())
         return false;
 
     beginRemoveRows(QModelIndex(), row, row + count - 1);
