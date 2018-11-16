@@ -1,12 +1,11 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.2
 import QtQuick.Controls.Material 2.3
-import "qrc:/views"
 
 Item {
     id: profileDelegate
     height: 120
-    width: 200
+    width: 400
 
     MouseArea {
         id: mouseArea
@@ -19,7 +18,7 @@ Item {
     Column {
         id: column
         anchors.left: parent.left
-        anchors.leftMargin: 20
+        anchors.leftMargin: 40
         anchors.verticalCenter: parent.verticalCenter
         spacing: 2
 
@@ -48,7 +47,7 @@ Item {
         anchors.rightMargin: 30
 
         onClicked: {
-            mainStack.push("qrc:/views/ProjectList.qml", {"profileId": id})
+            mainStack.push("./ProjectList.qml", {"profileId": id})
         }
     }
 

@@ -101,9 +101,9 @@ Page {
                     if (apiField.text === apiKey) {
                         apiField.isValid = isValid
                         if (isValid) {
-                            apiField.color = Material.Green
+                            apiField.color = Material.color(Material.Green)
                         } else {
-                            apiField.color = Material.Red
+                            apiField.color = Material.color(Material.Red)
                         }
                     }
                 }

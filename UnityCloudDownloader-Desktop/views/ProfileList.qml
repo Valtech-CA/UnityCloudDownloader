@@ -1,7 +1,6 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
-import "qrc:/views"
 
 Page {
     id: profilePage
@@ -17,7 +16,7 @@ Page {
                 Layout.fillWidth: true
                 Layout.leftMargin: 10
                 onClicked: {
-                    mainStack.push("qrc:/views/AddProfile.qml")
+                    mainStack.push("./AddProfile.qml")
                 }
             }
 
