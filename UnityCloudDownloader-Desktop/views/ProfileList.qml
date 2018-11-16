@@ -37,10 +37,6 @@ Page {
         anchors.fill: parent
         model: profileModel
         delegate: ProfileDelegate {}
-
-        Component.onCompleted: {
-            profileListView.currentIndex = -1
-            console.log(profileListView.currentIndex)
-        }
+        currentIndex: -1
     }
 }
