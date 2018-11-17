@@ -5,7 +5,9 @@
 #include "buildtargetdao.h"
 
 #include <QSqlDatabase>
+#include <QSqlQuery>
 #include <QUuid>
+#include <QVariant>
 
 namespace ucd
 {
@@ -41,6 +43,18 @@ void Database::init()
     ProfileDao(database).init();
     ProjectDao(database).init();
     //BuildTargetDao(database).init();
+}
+
+bool Database::hasProfiles() const
+{
+    auto database = QSqlDatabase::database(p->connectionName);
+    QSqlQuery query(database);
+    query.exec("SELECT COUNT(*) WHERE EXISTS(SELECT 1 FROM Profiles)");
+    if (query.next())
+    {
+        return query.value(0).toInt() != 0;
+    }
+    return false;
 }
 
 QSqlDatabase Database::sqlDatabase()

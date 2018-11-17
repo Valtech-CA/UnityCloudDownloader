@@ -30,7 +30,7 @@ void ProjectsModel::setDatabase(Database *database)
     m_db = database;
     if (m_db != nullptr && !m_profileId.isNull())
     {
-        m_projects = ProjectDao(m_db->sqlDatabase()).projects();
+        m_projects = ProjectDao(m_db->sqlDatabase()).projects(m_profileId);
     }
     else
     {
@@ -50,7 +50,7 @@ void ProjectsModel::setProfileId(const QUuid &profileId)
     m_profileId = profileId;
     if (m_db != nullptr && !m_profileId.isNull())
     {
-        m_projects = ProjectDao(m_db->sqlDatabase()).projects();
+        m_projects = ProjectDao(m_db->sqlDatabase()).projects(m_profileId);
     }
     else
     {

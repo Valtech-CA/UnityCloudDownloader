@@ -24,6 +24,8 @@ public:
 
     void init();
 
+    bool hasProfiles() const;
+
     QSqlDatabase sqlDatabase();
 
 private:

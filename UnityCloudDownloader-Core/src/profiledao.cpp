@@ -1,6 +1,7 @@
 #include "profiledao.h"
 
 #include "profile.h"
+#include "projectdao.h"
 
 #include <QSqlQuery>
 #include <QVariant>
@@ -56,7 +57,8 @@ void ProfileDao::removeProfile(const QUuid &profileId)
     query.prepare("DELETE FROM Profiles WHERE profileId = :profileId");
     query.bindValue(":profileId", profileId.toString());
     query.exec();
-    // TODO: delete child projects
+
+    ProjectDao(m_db).removeProfileProjects(profileId);
 }
 
 QVector<Profile> ProfileDao::profiles(bool includeProjects)
@@ -73,7 +75,7 @@ QVector<Profile> ProfileDao::profiles(bool includeProjects)
         profile.setApiKey(query.value("apiKey").toString());
         if (includeProjects)
         {
-            // TODO: get the projects
+            profile.setProjects(ProjectDao(m_db).projects(profile.uuid(), true));
         }
         profiles.append(std::move(profile));
     }

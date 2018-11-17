@@ -59,11 +59,20 @@ void ProjectDao::removeProject(const QUuid &projectId)
     // TODO: delete buildTargets
 }
 
-QVector<Project> ProjectDao::projects(bool includeBuildTargets)
+QVector<Project> ProjectDao::projects(const QUuid &profileId, bool includeBuildTargets)
 {
     QVector<Project> projects;
     QSqlQuery query(m_db);
-    query.exec("SELECT * FROM Projects");
+    if (profileId.isNull())
+    {
+        query.exec("SELECT * FROM Projects");
+    }
+    else
+    {
+        query.prepare("SELECT * FROM Projects WHERE profileId = :profileId");
+        query.bindValue(":profileId", profileId.toString());
+        query.exec();
+    }
     while (query.next())
     {
         Project project;
@@ -81,6 +90,19 @@ QVector<Project> ProjectDao::projects(bool includeBuildTargets)
     }
 
     return projects;
+}
+
+void ProjectDao::removeProfileProjects(const QUuid &profileId)
+{
+    QSqlQuery query(m_db);
+    query.prepare("SELECT projectId FROM Projects WHERE profileId = :profileId");
+    query.bindValue(":profileId", profileId.toString());
+    query.exec();
+    while (query.next())
+    {
+        auto projectId = QUuid::fromString(query.value("projectId").toString());
+        removeProject(projectId);
+    }
 }
 
 }
