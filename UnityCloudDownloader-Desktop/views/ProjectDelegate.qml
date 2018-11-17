@@ -8,6 +8,17 @@ Item {
     height: 120
     width: 400
 
+    Rectangle {
+        anchors.left: parent.left
+        anchors.leftMargin: 30
+        anchors.right: parent.right
+        anchors.rightMargin: 30
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 4
+        height: 2
+        color: Material.color(Material.Grey)
+    }
+
     Image {
         id: icon
         width: 60
@@ -21,10 +32,15 @@ Item {
         sourceSize.height: 60
     }
 
+    BusyIndicator {
+        anchors.fill: icon
+        running: icon.status === Image.Loading
+    }
+
     Text {
         text: name
         anchors.left: icon.right
-        anchors.leftMargin: 10
+        anchors.leftMargin: 20
         anchors.verticalCenter: parent.verticalCenter
         color: Material.foreground
         font.pointSize: 32

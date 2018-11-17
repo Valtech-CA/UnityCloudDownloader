@@ -168,6 +168,7 @@ void ProjectsModel::fetchMore(const QModelIndex &parent)
     connect(unityClient, &UnityApiClient::projectsFetched, unityClient, &UnityApiClient::deleteLater);
     connect(unityClient, &UnityApiClient::projectsFetched, this, &ProjectsModel::onProjectsFetched);
     unityClient->fetchProjects(apiKey);
+    m_hasSynced = true;
 }
 
 bool ProjectsModel::canFetchMore(const QModelIndex &parent) const
@@ -178,7 +179,9 @@ bool ProjectsModel::canFetchMore(const QModelIndex &parent) const
 
 void ProjectsModel::onProjectsFetched(const QVector<Project> &projects)
 {
-
+    beginResetModel();
+    m_projects = projects;
+    endResetModel();
 }
 
 bool ProjectsModel::isIndexValid(const QModelIndex &index) const

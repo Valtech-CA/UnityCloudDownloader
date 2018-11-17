@@ -5,6 +5,9 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonValue>
 
 namespace ucd
 {
@@ -54,7 +57,22 @@ void UnityApiClient::projectsReceived()
 
     if (reply->error() == 0)
     {
+        auto replyData = reply->readAll();
+        auto jsonDocument = QJsonDocument::fromJson(replyData);
+        auto jsonProjects = jsonDocument.array();
+        for (QJsonValue value : jsonProjects)
+        {
+            if (value["disabled"].toBool())
+                continue;
 
+            Project project;
+            project.setName(value["name"].toString());
+            project.setCloudId(value["projectid"].toString());
+            project.setOrganisationId(value["orgid"].toString());
+            project.setIconPath(value["cachedIcon"].toString());
+
+            projects.append(std::move(project));
+        }
     }
 
     emit projectsFetched(projects);
