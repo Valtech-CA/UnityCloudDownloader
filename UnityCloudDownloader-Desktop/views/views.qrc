@@ -10,5 +10,6 @@
         <file>angle_right.png</file>
         <file>ArrowButton.qml</file>
         <file>ProjectList.qml</file>
+        <file>ProjectDelegate.qml</file>
     </qresource>
 </RCC>

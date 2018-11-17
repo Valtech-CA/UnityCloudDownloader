@@ -31,11 +31,12 @@ Page {
     ListView {
         id: projectListView
         anchors.fill: parent
-        model: ProfilesModel {
+        model: ProjectsModel {
             database: ucdDb
+            profileId: projectList.profileId
         }
 
-        delegate: ProfileDelegate {
+        delegate: ProjectDelegate {
             width: parent.width
         }
         currentIndex: -1

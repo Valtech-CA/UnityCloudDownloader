@@ -20,7 +20,7 @@ Page {
                 Layout.fillWidth: true
                 Layout.leftMargin: 10
                 onClicked: {
-                    mainStack.push("./AddProfile.qml")
+                    mainStack.push("./AddProfile.qml", { "profilesModel": profilesModel })
                 }
             }
 
@@ -30,7 +30,7 @@ Page {
                 Layout.fillWidth: true
                 enabled: profileListView.currentIndex !== -1
                 onClicked: {
-                    profileModel.remove(profileListView.currentIndex)
+                    profilesModel.remove(profileListView.currentIndex)
                 }
             }
 
@@ -48,6 +48,7 @@ Page {
         id: profileListView
         anchors.fill: parent
         model: ProfilesModel {
+            id: profilesModel
             database: ucdDb
         }
 

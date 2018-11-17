@@ -5,7 +5,10 @@
 
 #include "unityclouddownloader-core_global.h"
 
+#include "project.h"
+
 #include <QObject>
+#include <QVector>
 
 class QNetworkAccessManager;
 
@@ -21,11 +24,15 @@ public:
 
     Q_INVOKABLE void testKey(const QString &apiKey);
 
+    Q_INVOKABLE void fetchProjects(const QString &apiKey);
+
 signals:
     void keyTested(bool isValid, QString apiKey);
+    void projectsFetched(QVector<Project> projects);
 
 private slots:
     void keyTestFinished();
+    void projectsReceived();
 
 private:
     QNetworkAccessManager *m_networkManager;

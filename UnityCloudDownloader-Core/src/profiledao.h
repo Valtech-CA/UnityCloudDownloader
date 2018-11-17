@@ -25,6 +25,8 @@ public:
     void removeProfile(const QUuid &profileId);
     QVector<Profile> profiles(bool includeProjects = false);
 
+    QString getApiKey(const QUuid &profileId);
+
 private:
     QSqlDatabase m_db;
 };

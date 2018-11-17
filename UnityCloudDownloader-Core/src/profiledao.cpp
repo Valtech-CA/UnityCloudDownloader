@@ -81,4 +81,19 @@ QVector<Profile> ProfileDao::profiles(bool includeProjects)
     return profiles;
 }
 
+QString ProfileDao::getApiKey(const QUuid &profileId)
+{
+    QSqlQuery query(m_db);
+    query.prepare("SELECT apiKey FROM Profiles WHERE profileId = :profileId");
+    query.bindValue(":profileId", profileId.toString());
+    query.exec();
+
+    if (query.next())
+    {
+        return query.value("apiKey").toString();
+    }
+
+    return "";
+}
+
 }

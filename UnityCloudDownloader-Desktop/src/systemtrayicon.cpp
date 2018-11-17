@@ -39,8 +39,7 @@ SystemTrayIcon::SystemTrayIcon(ucd::Database *data, QObject *parent)
 }
 
 SystemTrayIcon::~SystemTrayIcon()
-{
-}
+{}
 
 void SystemTrayIcon::onConfigure()
 {

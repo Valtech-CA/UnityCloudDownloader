@@ -3,9 +3,12 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import QtQuick.Dialogs 1.2
 import QtQuick.Controls.Material 2.3
+import ucd 1.0
 
 Page {
     id: addProfilePage
+
+    property ProfilesModel profilesModel: null
 
     footer: ToolBar {
         RowLayout {
@@ -139,7 +142,7 @@ Page {
             enabled: nameField.isValid && apiField.isValid && pathField.isValid
 
             onClicked: {
-                profileModel.createProfile(nameField.text, apiField.text, pathField.text)
+                addProfilePage.profilesModel.createProfile(nameField.text, apiField.text, pathField.text)
                 mainStack.pop()
             }
         }

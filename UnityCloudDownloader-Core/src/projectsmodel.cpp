@@ -2,7 +2,9 @@
 
 #include "project.h"
 #include "projectdao.h"
+#include "profiledao.h"
 #include "database.h"
+#include "unityapiclient.h"
 
 #include <QSqlDatabase>
 
@@ -11,6 +13,7 @@ namespace ucd
 
 ProjectsModel::ProjectsModel(QObject *parent)
     : QAbstractListModel(parent)
+    , m_hasSynced(false)
 {}
 
 ProjectsModel::~ProjectsModel()
@@ -153,6 +156,29 @@ Qt::ItemFlags ProjectsModel::flags(const QModelIndex &index) const
     if (!isIndexValid(index))
         return Qt::ItemFlags();
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+}
+
+void ProjectsModel::fetchMore(const QModelIndex &parent)
+{
+    Q_UNUSED(parent);
+    auto *unityClient = new UnityApiClient(this);
+
+    auto apiKey = ProfileDao(m_db->sqlDatabase()).getApiKey(m_profileId);
+
+    connect(unityClient, &UnityApiClient::projectsFetched, unityClient, &UnityApiClient::deleteLater);
+    connect(unityClient, &UnityApiClient::projectsFetched, this, &ProjectsModel::onProjectsFetched);
+    unityClient->fetchProjects(apiKey);
+}
+
+bool ProjectsModel::canFetchMore(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    return !m_hasSynced;
+}
+
+void ProjectsModel::onProjectsFetched(const QVector<Project> &projects)
+{
+
 }
 
 bool ProjectsModel::isIndexValid(const QModelIndex &index) const
