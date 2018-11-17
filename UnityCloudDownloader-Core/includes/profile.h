@@ -19,8 +19,8 @@ class UCD_SHARED_EXPORT Profile
 {
 public:
     Profile();
-    explicit Profile(const Profile &other);
-    explicit Profile(Profile &&other);
+    Profile(const Profile &other);
+    Profile(Profile &&other);
     ~Profile();
 
     Profile& operator=(const Profile &other);

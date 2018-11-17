@@ -19,8 +19,8 @@ class UCD_SHARED_EXPORT Project
 {
 public:
     Project();
-    explicit Project(const Project &other);
-    explicit Project(Project &&other);
+    Project(const Project &other);
+    Project(Project &&other);
     ~Project();
 
     Project& operator=(const Project &other);

@@ -42,7 +42,7 @@ void Database::init()
     auto database = QSqlDatabase::database(p->connectionName);
     ProfileDao(database).init();
     ProjectDao(database).init();
-    //BuildTargetDao(database).init();
+    BuildTargetDao(database).init();
 }
 
 bool Database::hasProfiles() const

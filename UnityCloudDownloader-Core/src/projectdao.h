@@ -24,8 +24,9 @@ public:
     void updateProject(const Project &project);
     void removeProject(const QUuid &projectId);
     QVector<Project> projects(const QUuid &profileId, bool includeBuildTargets = false);
+    Project project(const QUuid &projectId, bool includeBuildTargets = false);
 
-    void removeProfileProjects(const QUuid &profileId);
+    void removeProjects(const QUuid &profileId);
 
 private:
     QSqlDatabase m_db;

@@ -7,6 +7,7 @@
 
 #include <QMetaType>
 #include <QString>
+#include <QUuid>
 
 namespace ucd
 {
@@ -15,29 +16,29 @@ class UCD_SHARED_EXPORT BuildTarget
 {
 public:
     BuildTarget();
-    explicit BuildTarget(const BuildTarget &other);
-    explicit BuildTarget(BuildTarget &&other);
+    BuildTarget(const BuildTarget &other);
+    BuildTarget(BuildTarget &&other);
     ~BuildTarget();
 
     BuildTarget& operator=(const BuildTarget &other);
     BuildTarget& operator=(BuildTarget &&other);
 
     const QString& name() const { return m_name; }
-    const QString& id() const { return m_id; }
-    const QString& profileId() const { return m_profileId; }
-    const QString& projectId() const { return m_projectId; }
+    const QUuid& id() const { return m_id; }
+    const QUuid& projectId() const { return m_projectId; }
+    const QString& cloudId() const { return m_cloudId; }
     const QString& platform() const { return m_platform; }
 
     void setName(const QString &name);
-    void setId(const QString &id);
-    void setProfileId(const QString &profileId);
-    void setProjectId(const QString &projectId);
+    void setId(const QUuid &id);
+    void setProjectId(const QUuid &projectId);
+    void setCloudId(const QString &cloudId);
     void setPlatform(const QString &platform);
 
 private:
-    QString m_id;
-    QString m_profileId;
-    QString m_projectId;
+    QUuid m_id;
+    QUuid m_projectId;
+    QString m_cloudId;
     QString m_name;
     QString m_platform;
 };

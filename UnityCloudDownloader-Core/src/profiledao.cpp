@@ -58,7 +58,7 @@ void ProfileDao::removeProfile(const QUuid &profileId)
     query.bindValue(":profileId", profileId.toString());
     query.exec();
 
-    ProjectDao(m_db).removeProfileProjects(profileId);
+    ProjectDao(m_db).removeProjects(profileId);
 }
 
 QVector<Profile> ProfileDao::profiles(bool includeProjects)

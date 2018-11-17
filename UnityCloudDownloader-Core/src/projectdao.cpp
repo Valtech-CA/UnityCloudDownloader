@@ -92,7 +92,36 @@ QVector<Project> ProjectDao::projects(const QUuid &profileId, bool includeBuildT
     return projects;
 }
 
-void ProjectDao::removeProfileProjects(const QUuid &profileId)
+Project ProjectDao::project(const QUuid &projectId, bool includeBuildTargets)
+{
+    Project project;
+    QSqlQuery query(m_db);
+    query.prepare("SELECT * FROM Projects WHERE projectId = :projectId");
+    query.bindValue(":projectId", projectId.toString());
+    query.exec();
+    if (query.next())
+    {
+        project.setId(projectId);
+        project.setProfileId(QUuid::fromString(query.value("profileId").toString()));
+        project.setCloudId(query.value("cloudId").toString());
+        project.setName(query.value("name").toString());
+        project.setOrganisationId(query.value("orgId").toString());
+        project.setIconPath(query.value("iconPath").toString());
+        if (includeBuildTargets)
+        {
+            // TODO: get build targets
+        }
+    }
+    else
+    {
+        // set project id to null to mark it as invalid
+        project.setId(QUuid());
+    }
+
+    return project;
+}
+
+void ProjectDao::removeProjects(const QUuid &profileId)
 {
     QSqlQuery query(m_db);
     query.prepare("SELECT projectId FROM Projects WHERE profileId = :profileId");
