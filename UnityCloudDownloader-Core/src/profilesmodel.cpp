@@ -11,8 +11,7 @@ namespace ucd
 
 ProfilesModel::ProfilesModel(QObject *parent)
     : QAbstractListModel(parent)
-{
-}
+{}
 
 ProfilesModel::ProfilesModel(Database *data, QObject *parent)
     : QAbstractListModel(parent)
@@ -121,6 +120,7 @@ bool ProfilesModel::setData(const QModelIndex &index, const QVariant &value, int
         return false;
     }
 
+    ProfileDao(m_db->sqlDatabase()).updateProfile(profile);
     return true;
 }
 

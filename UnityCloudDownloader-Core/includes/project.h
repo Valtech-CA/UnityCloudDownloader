@@ -8,6 +8,7 @@
 
 #include <QString>
 #include <QVector>
+#include <QUuid>
 
 namespace ucd
 {
@@ -26,22 +27,25 @@ public:
     Project& operator=(Project &&other);
 
     const QString& name() const { return m_name; }
-    const QString& id() const { return m_id; }
-    const QString& profileId() const { return m_profileId; }
+    const QUuid& id() const { return m_id; }
+    const QUuid& profileId() const { return m_profileId; }
+    const QString& cloudId() const { return m_cloudId; }
     const QString& organisationId() const { return m_orgId; }
     const QString& iconPath() const { return m_iconPath; }
     const BuildTargetList& buildTargets() const { return m_buildTargets; }
 
     void setName(const QString &name);
-    void setId(const QString &id);
-    void setProfileId(const QString &profileId);
+    void setId(const QUuid &id);
+    void setProfileId(const QUuid &profileId);
+    void setCloudId(const QString &cloudId);
     void setOrganisationId(const QString &id);
     void setIconPath(const QString &iconPath);
     void setBuildTargets(const BuildTargetList &buildTargets);
 
 private:
-    QString m_id;
-    QString m_profileId;
+    QUuid m_id;
+    QUuid m_profileId;
+    QString m_cloudId;
     QString m_name;
     QString m_orgId;
     QString m_iconPath;

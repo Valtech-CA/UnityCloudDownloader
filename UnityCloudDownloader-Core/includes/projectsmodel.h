@@ -19,12 +19,13 @@ class UCD_SHARED_EXPORT ProjectsModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(ucd::Database* database READ database WRITE setDatabase NOTIFY databaseChanged)
-    Q_PROPERTY(QUuid profileId READ profileId WRITE setRProfileId NOTIFY profileIdChanged)
+    Q_PROPERTY(QUuid profileId READ profileId WRITE setProfileId NOTIFY profileIdChanged)
 public:
     enum Roles : int
     {
         ProjectId = Qt::UserRole + 1,
         ProfileId,
+        CloudId,
         Name,
         OrganisationId,
         IconPath,

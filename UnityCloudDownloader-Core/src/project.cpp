@@ -6,6 +6,7 @@ namespace ucd
 {
 
 Project::Project()
+    : m_id(QUuid::createUuid())
 {}
 
 Project::Project(const Project &other)
@@ -46,19 +47,24 @@ void Project::setName(const QString &name)
     m_name = name;
 }
 
-void Project::setId(const QString &id)
+void Project::setId(const QUuid &id)
 {
     m_id = id;
 }
 
-void Project::setProfileId(const QString &profileId)
+void Project::setProfileId(const QUuid &profileId)
 {
     m_profileId = profileId;
 }
 
+void Project::setCloudId(const QString &cloudId)
+{
+    m_cloudId = cloudId;
+}
+
 void Project::setOrganisationId(const QString &id)
 {
-    m_id = id;
+    m_orgId = id;
 }
 
 void Project::setIconPath(const QString &iconPath)
@@ -101,7 +107,7 @@ QDataStream &operator>>(QDataStream &in, ucd::BuildTargetList &dest)
 
 QDataStream &operator<<(QDataStream &out, const ucd::Project &value)
 {
-    out << value.name() << value.id() << value.profileId() << value.organisationId() << value.iconPath() << value.buildTargets();
+    out << value.name() << value.id() << value.profileId() << value.cloudId() << value.organisationId() << value.iconPath() << value.buildTargets();
     return out;
 }
 
@@ -109,10 +115,12 @@ QDataStream &operator>>(QDataStream &in, ucd::Project &dest)
 {
     QString name;
     in >> name;
-    QString id;
+    QUuid id;
     in >> id;
-    QString profileId;
+    QUuid profileId;
     in >> profileId;
+    QString cloudId;
+    in >> cloudId;
     QString orgId;
     in >> orgId;
     QString iconPath;
@@ -123,6 +131,7 @@ QDataStream &operator>>(QDataStream &in, ucd::Project &dest)
     dest.setName(name);
     dest.setId(id);
     dest.setProfileId(profileId);
+    dest.setCloudId(cloudId);
     dest.setOrganisationId(orgId);
     dest.setIconPath(iconPath);
     dest.setBuildTargets(buildTargetList);

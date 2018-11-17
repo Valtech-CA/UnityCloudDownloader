@@ -15,8 +15,7 @@ UnityApiClient::UnityApiClient(QObject *parent)
 }
 
 UnityApiClient::~UnityApiClient()
-{
-}
+{}
 
 void UnityApiClient::testKey(const QString &apiKey)
 {

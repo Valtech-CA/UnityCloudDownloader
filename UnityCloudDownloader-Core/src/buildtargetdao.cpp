@@ -7,9 +7,7 @@ namespace ucd
 
 BuildTargetDao::BuildTargetDao(QSqlDatabase &database)
     : m_db(database)
-{
-
-}
+{}
 
 void BuildTargetDao::init()
 {
