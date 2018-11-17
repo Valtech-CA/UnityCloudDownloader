@@ -6,6 +6,8 @@
 #include "database.h"
 #include "unityapiclient.h"
 
+#include <algorithm>
+
 #include <QSqlDatabase>
 
 namespace ucd
@@ -59,6 +61,35 @@ void ProjectsModel::setProfileId(const QUuid &profileId)
     emit profileIdChanged(profileId);
 }
 
+bool ProjectsModel::updateProject(int row, const Project &project)
+{
+    if (row >= m_projects.size())
+        return false;
+
+    auto &currentProject = m_projects[row];
+
+    if (currentProject.name() == project.name()
+            && currentProject.iconPath() == project.iconPath())
+        return true;
+
+    currentProject.setName(project.name());
+    currentProject.setIconPath(project.iconPath());
+
+    ProjectDao(m_db->sqlDatabase()).updateProject(currentProject);
+    emit dataChanged(index(row), index(row));
+    return true;
+}
+
+void ProjectsModel::addProject(const Project &project)
+{
+    beginInsertRows(QModelIndex(), m_projects.size(), m_projects.size());
+    Project newProject(project);
+    newProject.setProfileId(m_profileId);
+    ProjectDao(m_db->sqlDatabase()).addProject(newProject);
+    m_projects.append(std::move(newProject));
+    endInsertRows();
+}
+
 int ProjectsModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
@@ -107,9 +138,11 @@ bool ProjectsModel::setData(const QModelIndex &index, const QVariant &value, int
     case Qt::EditRole:
     case Roles::Name:
         project.setName(value.toString());
+        emit dataChanged(index, index, QVector<int>{ Qt::DisplayRole, Qt::EditRole, Roles::Name });
         break;
     case Roles::IconPath:
         project.setIconPath(value.toString());
+        emit dataChanged(index, index, QVector<int>{ Roles::IconPath });
         break;
     default:
         return false;
@@ -179,9 +212,41 @@ bool ProjectsModel::canFetchMore(const QModelIndex &parent) const
 
 void ProjectsModel::onProjectsFetched(const QVector<Project> &projects)
 {
-    beginResetModel();
-    m_projects = projects;
-    endResetModel();
+    int count = m_projects.size();
+
+    while (count--)
+    {
+        auto cloudId = m_projects.at(count).cloudId();
+
+        auto cloudProjectIt = std::find_if(
+                    std::begin(projects),
+                    std::end(projects),
+                    [cloudId](const auto &project) -> bool { return project.cloudId() == cloudId; });
+
+        // remove projects that no longer exists
+        if (cloudProjectIt == std::end(projects))
+        {
+            removeRow(count);
+            continue;
+        }
+        else // update existing project
+        {
+            updateProject(count, *cloudProjectIt);
+        }
+    }
+
+    // add new projects
+    for (const auto &cloudProject : projects)
+    {
+        auto cloudId = cloudProject.cloudId();
+        if (std::none_of(
+                    std::begin(m_projects),
+                    std::end(m_projects),
+                    [cloudId](const auto &project) -> bool { return project.cloudId() == cloudId; }))
+        {
+            addProject(cloudProject);
+        }
+    }
 }
 
 bool ProjectsModel::isIndexValid(const QModelIndex &index) const
