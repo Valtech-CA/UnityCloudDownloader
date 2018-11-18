@@ -92,7 +92,7 @@ void ProjectsModel::addProject(const Project &project)
 
 int ProjectsModel::rowCount(const QModelIndex &parent) const
 {
-    Q_UNUSED(parent)
+    Q_UNUSED(parent);
     return m_projects.count();
 }
 
@@ -154,11 +154,10 @@ bool ProjectsModel::setData(const QModelIndex &index, const QVariant &value, int
 
 bool ProjectsModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-    Q_UNUSED(parent);
     if (row + count > m_projects.count())
         return false;
 
-    beginRemoveRows(QModelIndex(), row, row + count -1);
+    beginRemoveRows(parent, row, row + count - 1);
 
     ProjectDao dao(m_db->sqlDatabase());
     for (int i = row, end = row + count; i < end; ++i)
