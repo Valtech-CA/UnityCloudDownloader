@@ -4,6 +4,7 @@
 
 #include <QVariant>
 #include <QSqlQuery>
+#include <QSqlError>
 
 namespace ucd
 {
@@ -28,14 +29,17 @@ void BuildTargetDao::init()
 void BuildTargetDao::addBuildTarget(const BuildTarget &buildTarget)
 {
     QSqlQuery query(m_db);
-    query.prepare("INSET INTO BuildTargets (buildTargetId, projectId, cloudId, name, platform) "
+    query.prepare("INSERT INTO BuildTargets (buildTargetId, projectId, cloudId, name, platform) "
                   "VALUES (:buildTargetId, :projectId, :cloudId, :name, :platform)");
     query.bindValue(":buildTargetId", buildTarget.id().toString());
     query.bindValue(":projectId", buildTarget.projectId().toString());
     query.bindValue(":cloudId", buildTarget.cloudId());
     query.bindValue(":name", buildTarget.name());
     query.bindValue(":platform", buildTarget.platform());
-    query.exec();
+    if (!query.exec())
+    {
+        throw std::runtime_error(query.lastError().text().toUtf8());
+    }
 }
 
 void BuildTargetDao::updateBuildTarget(const BuildTarget &buildTarget)
@@ -46,7 +50,10 @@ void BuildTargetDao::updateBuildTarget(const BuildTarget &buildTarget)
     query.bindValue(":name", buildTarget.name());
     query.bindValue(":platform", buildTarget.platform());
     query.bindValue(":buildTargetId", buildTarget.id());
-    query.exec();
+    if (!query.exec())
+    {
+        throw std::runtime_error(query.lastError().text().toUtf8());
+    }
 }
 
 void BuildTargetDao::removeBuildTarget(const QUuid &buildTargetId)
@@ -54,7 +61,10 @@ void BuildTargetDao::removeBuildTarget(const QUuid &buildTargetId)
     QSqlQuery query(m_db);
     query.prepare("DELETE FROM BuildTargets WHERE buildTargetId = :buildTargetId");
     query.bindValue(":buildTargetId", buildTargetId.toString());
-    query.exec();
+    if (!query.exec())
+    {
+        throw std::runtime_error(query.lastError().text().toUtf8());
+    }
 
     // TODO: delete builds
 }

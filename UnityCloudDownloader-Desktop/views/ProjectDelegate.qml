@@ -52,6 +52,10 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: 30
         anchors.verticalCenter: parent.verticalCenter
+
+        onClicked: {
+            mainStack.push("./BuildTargetList.qml", {"projectId": id})
+        }
     }
 
 

@@ -1,8 +1,10 @@
 #include "projectdao.h"
 
 #include "project.h"
+#include "buildtargetdao.h"
 
 #include <QSqlQuery>
+#include <QSqlError>
 #include <QVariant>
 
 namespace ucd
@@ -29,25 +31,31 @@ void ProjectDao::addProject(const Project &project)
 {
     QSqlQuery query(m_db);
     query.prepare("INSERT INTO Projects (projectId, profileId, cloudId, name, orgId, iconPath) "
-                  "VALUES (:projectId, :profileId, :cloudId, :name, :orgId, :iconPaht)");
+                  "VALUES (:projectId, :profileId, :cloudId, :name, :orgId, :iconPath)");
     query.bindValue(":projectId", project.id().toString());
     query.bindValue(":profileId", project.profileId().toString());
     query.bindValue(":cloudId", project.cloudId());
     query.bindValue(":name", project.name());
     query.bindValue(":orgId", project.organisationId());
     query.bindValue(":iconPath", project.iconPath());
-    query.exec();
+    if (!query.exec())
+    {
+        throw std::runtime_error(query.lastError().text().toUtf8());
+    }
 }
 
 void ProjectDao::updateProject(const Project &project)
 {
     QSqlQuery query(m_db);
-    query.prepare("UPDATE Projecta SET name = :name, iconPath = :iconPath "
+    query.prepare("UPDATE Projects SET name = :name, iconPath = :iconPath "
                   "WHERE projectId = :projectId");
     query.bindValue(":name", project.name());
     query.bindValue(":iconPath", project.iconPath());
     query.bindValue(":projectId", project.id());
-    query.exec();
+    if (!query.exec())
+    {
+        throw std::runtime_error(query.lastError().text().toUtf8());
+    }
 }
 
 void ProjectDao::removeProject(const QUuid &projectId)
@@ -55,8 +63,12 @@ void ProjectDao::removeProject(const QUuid &projectId)
     QSqlQuery query(m_db);
     query.prepare("DELETE FROM Projects WHERE projectId = :projectId");
     query.bindValue(":projectId", projectId);
-    query.exec();
-    // TODO: delete buildTargets
+    if (!query.exec())
+    {
+        throw std::runtime_error(query.lastError().text().toUtf8());
+    }
+
+    BuildTargetDao(m_db).removeBuildTargets(projectId);
 }
 
 QVector<Project> ProjectDao::projects(const QUuid &profileId, bool includeBuildTargets)

@@ -16,6 +16,7 @@ namespace ucd
 
 BuildTargetsModel::BuildTargetsModel(QObject *parent)
         : QAbstractListModel(parent)
+        , m_hasSynced(false)
 {}
 
 BuildTargetsModel::~BuildTargetsModel()

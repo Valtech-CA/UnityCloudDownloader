@@ -11,5 +11,8 @@
         <file>ArrowButton.qml</file>
         <file>ProjectList.qml</file>
         <file>ProjectDelegate.qml</file>
+        <file>BuildTargetList.qml</file>
+        <file>BackNavigationBar.qml</file>
+        <file>BuildTargetDelegate.qml</file>
     </qresource>
 </RCC>

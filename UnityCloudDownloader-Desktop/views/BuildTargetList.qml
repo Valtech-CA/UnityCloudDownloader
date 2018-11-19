@@ -5,21 +5,21 @@ import QtQuick.Layouts 1.3
 import ucd 1.0
 
 Page {
-    id: projectList
+    id: buildTargetList
 
-    property string profileId: ""
+    property string projectId: ""
 
     footer: BackNavigationBar {}
 
     ListView {
-        id: projectListView
+        id: buildTargetListView
         anchors.fill: parent
-        model: ProjectsModel {
+        model: BuildTargetsModel {
             database: ucdDb
-            profileId: projectList.profileId
+            projectId: buildTargetList.projectId
         }
 
-        delegate: ProjectDelegate {
+        delegate: BuildTargetDelegate {
             width: parent.width
         }
         currentIndex: -1
