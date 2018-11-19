@@ -9,6 +9,8 @@ ItemDelegate {
     width: 600
     clip: true
 
+    onClicked: ListView.view.currentIndex = index
+
     Behavior on height {
         NumberAnimation {
             easing.type: Easing.OutSine

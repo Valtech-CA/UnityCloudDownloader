@@ -23,6 +23,9 @@ Page {
             width: parent.width
         }
         currentIndex: -1
+
+        highlight: ItemHighlight {}
+        highlightMoveDuration: 200
     }
 
 }
