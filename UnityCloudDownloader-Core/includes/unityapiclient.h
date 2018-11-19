@@ -32,17 +32,20 @@ public:
 
     Q_INVOKABLE void fetchProjects();
     Q_INVOKABLE void fetchBuildTargets(const QString &orgId, const QString &projectId);
+    Q_INVOKABLE void fetchBuilds(const QString &orgId, const QString &porjectId, const QString &buildTargetId);
 
 signals:
     void apiKeyChanged(QString apiKey);
     void keyTested(bool isValid, QString apiKey);
     void projectsFetched(QVector<Project> projects);
     void buildTargetsFetched(QVector<BuildTarget> buildTargets);
+    void buildsFetched();
 
 private slots:
     void keyTestFinished();
     void projectsReceived();
     void buildTargetsReceived();
+    void buildsReceived();
 
 private:
     QString m_apiKey;

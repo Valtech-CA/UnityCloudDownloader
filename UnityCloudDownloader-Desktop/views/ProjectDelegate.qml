@@ -3,10 +3,12 @@ import QtQuick.Controls 2.3
 import QtQuick.Layouts 1.3
 import QtQuick.Controls.Material 2.0
 
-Item {
+ItemDelegate {
     id: projectDelegate
     height: 120
     width: 400
+
+    onClicked: ListView.view.currentIndex = index
 
     Rectangle {
         anchors.left: parent.left
@@ -57,6 +59,4 @@ Item {
             mainStack.push("./BuildTargetList.qml", {"projectId": id})
         }
     }
-
-
 }

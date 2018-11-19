@@ -2,10 +2,14 @@ import QtQuick 2.9
 import QtQuick.Controls 2.2
 import QtQuick.Controls.Material 2.3
 
-Item {
+ItemDelegate {
     id: profileDelegate
     height: 120
     width: 400
+
+    onClicked: {
+        ListView.view.currentIndex = index
+    }
 
     Rectangle {
         id: rect
@@ -15,14 +19,6 @@ Item {
         border.color: Material.color(Material.Grey)
         border.width: 2
         radius: 10
-    }
-
-    MouseArea {
-        id: mouseArea
-        anchors.fill: parent
-        onClicked: {
-            profileDelegate.ListView.view.currentIndex = index
-        }
     }
 
     Column {

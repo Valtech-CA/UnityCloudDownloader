@@ -6,6 +6,7 @@ namespace ucd
 {
 
 BuildTarget::BuildTarget()
+    : m_id(QUuid::createUuid())
 {}
 
 BuildTarget::BuildTarget(const BuildTarget &other)

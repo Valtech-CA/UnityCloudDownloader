@@ -77,6 +77,15 @@ void UnityApiClient::fetchBuildTargets(const QString &orgId, const QString &proj
     connect(reply, &QNetworkReply::finished, this, &UnityApiClient::buildTargetsReceived);
 }
 
+void UnityApiClient::fetchBuilds(const QString &orgId, const QString &projectId, const QString &buildTargetId)
+{
+    QNetworkRequest request(QUrl{API("/orgs/%1/projects/%2/buildtargets/%3/builds").arg(orgId, projectId, buildTargetId)});
+    setAuthorization(request, m_apiKey);
+
+    auto *reply = m_networkManager->get(request);
+    connect(reply, &QNetworkReply::finished, this, &UnityApiClient::buildsReceived);
+}
+
 void UnityApiClient::keyTestFinished()
 {
     auto *reply = qobject_cast<QNetworkReply*>(sender());
@@ -138,6 +147,26 @@ void UnityApiClient::buildTargetsReceived()
     }
 
     emit buildTargetsFetched(buildTargets);
+}
+
+void UnityApiClient::buildsReceived()
+{
+    auto *reply = qobject_cast<QNetworkReply*>(sender());
+    reply->deleteLater();
+    QVector<int> builds;
+
+    if (reply->error() == 0)
+    {
+        auto replyData = reply->readAll();
+        auto jsonDocument = QJsonDocument::fromJson(replyData);
+        auto jsonData = jsonDocument.array();
+        for (QJsonValue value : jsonData)
+        {
+            // TODO
+        }
+    }
+
+    emit buildsFetched();
 }
 
 }
