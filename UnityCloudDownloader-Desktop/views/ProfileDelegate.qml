@@ -12,13 +12,14 @@ ItemDelegate {
     }
 
     Rectangle {
-        id: rect
-        anchors.fill: parent
-        anchors.margins: 4
-        color: "transparent"
-        border.color: Material.color(Material.Grey)
-        border.width: 2
-        radius: 10
+        anchors.left: parent.left
+        anchors.leftMargin: 30
+        anchors.right: parent.right
+        anchors.rightMargin: 30
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 4
+        height: 2
+        color: Material.color(Material.Grey)
     }
 
     Column {

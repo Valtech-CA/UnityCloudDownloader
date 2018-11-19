@@ -20,7 +20,9 @@ Page {
                 Layout.fillWidth: true
                 Layout.leftMargin: 10
                 onClicked: {
-                    mainStack.push("./AddProfile.qml", { "profilesModel": profilesModel })
+                    mainStack.push("./AddProfile.qml", {
+                                       "profilesModel": profilesModel
+                                   })
                 }
             }
 
@@ -56,13 +58,20 @@ Page {
             width: parent.width
         }
         currentIndex: -1
-        highlight: Item {
-                Rectangle {
-                color: "transparent"
-                border.color: Material.color(Material.Blue)
-                radius: 10
-                anchors.fill: parent
-                anchors.margins: 2
+        highlight: Rectangle {
+            gradient: Gradient {
+                GradientStop {
+                    position: 0.00;
+                    color: "#00ffffff";
+                }
+                GradientStop {
+                    position: 0.30;
+                    color: "#18ffffff";
+                }
+                GradientStop {
+                    position: 1.00;
+                    color: "#00ffffff";
+                }
             }
         }
     }
