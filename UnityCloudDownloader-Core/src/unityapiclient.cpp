@@ -1,6 +1,7 @@
 #include "unityapiclient.h"
 
 #include "project.h"
+#include "buildtarget.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -9,8 +10,17 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
+#include <QDebug>
+
+#define API(endPoint) QStringLiteral("https://build-api.cloud.unity3d.com/api/v1" endPoint)
+
 namespace ucd
 {
+
+static void setAuthorization(QNetworkRequest &request, const QString &apiKey)
+{
+    request.setRawHeader("Authorization", QStringLiteral("Basic %1").arg(apiKey).toUtf8());
+}
 
 UnityApiClient::UnityApiClient(QObject *parent)
     : QObject(parent)
@@ -19,26 +29,52 @@ UnityApiClient::UnityApiClient(QObject *parent)
     m_networkManager = new QNetworkAccessManager(this);
 }
 
+UnityApiClient::UnityApiClient(const QString &apiKey, QObject *parent)
+    : QObject(parent)
+    , m_apiKey(apiKey)
+    , m_networkManager(nullptr)
+{
+    m_networkManager = new QNetworkAccessManager(this);
+}
+
 UnityApiClient::~UnityApiClient()
 {}
 
+void UnityApiClient::setApiKey(const QString &apiKey)
+{
+    if (apiKey == m_apiKey)
+        return;
+
+    m_apiKey = apiKey;
+    emit apiKeyChanged(apiKey);
+}
+
 void UnityApiClient::testKey(const QString &apiKey)
 {
-    QNetworkRequest request(QUrl{"https://build-api.cloud.unity3d.com/api/v1/users/me"});
-    request.setRawHeader("Authorization", QString("Basic %1").arg(apiKey).toUtf8());
+    QNetworkRequest request(QUrl{API("/users/me")});
+    setAuthorization(request, apiKey);
 
     auto *reply = m_networkManager->get(request);
     reply->setProperty("unityApiKey", apiKey);
     connect(reply, &QNetworkReply::finished, this, &UnityApiClient::keyTestFinished);
 }
 
-void UnityApiClient::fetchProjects(const QString &apiKey)
+void UnityApiClient::fetchProjects()
 {
-    QNetworkRequest request(QUrl{"https://build-api.cloud.unity3d.com/api/v1/projects"});
-    request.setRawHeader("Authorization", QString("Basic %1").arg(apiKey).toUtf8());
+    QNetworkRequest request(QUrl{API("/projects")});
+    setAuthorization(request, m_apiKey);
 
     auto *reply = m_networkManager->get(request);
     connect(reply, &QNetworkReply::finished, this, &UnityApiClient::projectsReceived);
+}
+
+void UnityApiClient::fetchBuildTargets(const QString &orgId, const QString &projectId)
+{
+    QNetworkRequest request(QUrl{API("/orgs/%1/projects/%2/buildtargets").arg(orgId, projectId)});
+    setAuthorization(request, m_apiKey);
+
+    auto *reply = m_networkManager->get(request);
+    connect(reply, &QNetworkReply::finished, this, &UnityApiClient::buildTargetsReceived);
 }
 
 void UnityApiClient::keyTestFinished()
@@ -53,6 +89,7 @@ void UnityApiClient::keyTestFinished()
 void UnityApiClient::projectsReceived()
 {
     auto *reply = qobject_cast<QNetworkReply*>(sender());
+    reply->deleteLater();
     QVector<Project> projects;
 
     if (reply->error() == 0)
@@ -76,7 +113,31 @@ void UnityApiClient::projectsReceived()
     }
 
     emit projectsFetched(projects);
+}
+
+void UnityApiClient::buildTargetsReceived()
+{
+    auto *reply = qobject_cast<QNetworkReply*>(sender());
     reply->deleteLater();
+    QVector<BuildTarget> buildTargets;
+
+    if (reply->error() == 0)
+    {
+        auto replyData = reply->readAll();
+        auto jsonDocument = QJsonDocument::fromJson(replyData);
+        auto jsonData = jsonDocument.array();
+        for (QJsonValue value : jsonData)
+        {
+            BuildTarget buildTarget;
+            buildTarget.setName(value["name"].toString());
+            buildTarget.setCloudId(value["buildtargetid"].toString());
+            buildTarget.setPlatform(value["platform"].toString());
+
+            buildTargets.append(std::move(buildTarget));
+        }
+    }
+
+    emit buildTargetsFetched(buildTargets);
 }
 
 }

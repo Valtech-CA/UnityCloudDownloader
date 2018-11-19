@@ -55,6 +55,9 @@ signals:
     void databaseChanged(Database *database);
     void projectIdChanged(QUuid projectId);
 
+private slots:
+    void onBuildTargetsFetched(const QVector<BuildTarget> &buildTargets);
+
 private:
     bool isIndexValid(const QModelIndex &index) const;
 

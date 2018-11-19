@@ -3,6 +3,7 @@
 #include "buildtarget.h"
 #include "buildtargetdao.h"
 #include "projectdao.h"
+#include "profiledao.h"
 #include "database.h"
 #include "unityapiclient.h"
 
@@ -14,7 +15,7 @@ namespace ucd
 {
 
 BuildTargetsModel::BuildTargetsModel(QObject *parent)
-    : QAbstractListModel(parent)
+        : QAbstractListModel(parent)
 {}
 
 BuildTargetsModel::~BuildTargetsModel()
@@ -68,7 +69,7 @@ bool BuildTargetsModel::updateBuildTarget(int row, const BuildTarget &buildTarge
     auto &currentBuildTarget = m_buildTargets[row];
 
     if (currentBuildTarget.name() == buildTarget.name()
-            && currentBuildTarget.platform() == buildTarget.platform())
+        && currentBuildTarget.platform() == buildTarget.platform())
         return true;
 
     currentBuildTarget.setName(buildTarget.name());
@@ -189,7 +190,14 @@ Qt::ItemFlags BuildTargetsModel::flags(const QModelIndex &index) const
 void BuildTargetsModel::fetchMore(const QModelIndex &parent)
 {
     Q_UNUSED(parent);
-    // TODO: implement
+
+    auto project = ProjectDao(m_db->sqlDatabase()).project(m_projectId);
+    auto apiKey = ProfileDao(m_db->sqlDatabase()).getApiKey(project.profileId());
+    auto *unityClient = new UnityApiClient(apiKey, this);
+
+    connect(unityClient, &UnityApiClient::buildTargetsFetched, unityClient, &UnityApiClient::deleteLater);
+    connect(unityClient, &UnityApiClient::buildTargetsFetched, this, &BuildTargetsModel::onBuildTargetsFetched);
+    unityClient->fetchBuildTargets(project.organisationId(), project.cloudId());
     m_hasSynced = true;
 }
 
@@ -197,6 +205,48 @@ bool BuildTargetsModel::canFetchMore(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return !m_hasSynced;
+}
+
+void BuildTargetsModel::onBuildTargetsFetched(const QVector<BuildTarget> &buildTargets)
+{
+    int count = m_buildTargets.size();
+
+    while (count--)
+    {
+        auto cloudId = m_buildTargets.at(count).cloudId();
+
+        auto cloudBuildTargtIt = std::find_if(
+                                         std::begin(buildTargets),
+                                         std::end(buildTargets),
+                                         [cloudId](const auto &buildTarget) -> bool
+        {
+            return buildTarget.cloudId() == cloudId;
+        });
+
+        // remove build targets that no longer exists
+        if (cloudBuildTargtIt == std::end(buildTargets))
+        {
+            removeRow(count);
+            continue;
+        }
+        else // update existing build target
+        {
+            updateBuildTarget(count, *cloudBuildTargtIt);
+        }
+    }
+
+    // add new projects
+    for (const auto &cloudBuildTargt : buildTargets)
+    {
+        auto cloudId = cloudBuildTargt.cloudId();
+        if (std::none_of(
+                    std::begin(m_buildTargets),
+                    std::end(m_buildTargets),
+                    [cloudId](const auto &buildTarget) -> bool { return buildTarget.cloudId() == cloudId; }))
+        {
+            addBuildTarget(cloudBuildTargt);
+        }
+    }
 }
 
 bool BuildTargetsModel::isIndexValid(const QModelIndex &index) const

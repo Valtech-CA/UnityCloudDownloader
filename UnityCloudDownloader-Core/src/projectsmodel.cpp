@@ -193,13 +193,13 @@ Qt::ItemFlags ProjectsModel::flags(const QModelIndex &index) const
 void ProjectsModel::fetchMore(const QModelIndex &parent)
 {
     Q_UNUSED(parent);
-    auto *unityClient = new UnityApiClient(this);
 
     auto apiKey = ProfileDao(m_db->sqlDatabase()).getApiKey(m_profileId);
+    auto *unityClient = new UnityApiClient(apiKey, this);
 
     connect(unityClient, &UnityApiClient::projectsFetched, unityClient, &UnityApiClient::deleteLater);
     connect(unityClient, &UnityApiClient::projectsFetched, this, &ProjectsModel::onProjectsFetched);
-    unityClient->fetchProjects(apiKey);
+    unityClient->fetchProjects();
     m_hasSynced = true;
 }
 
