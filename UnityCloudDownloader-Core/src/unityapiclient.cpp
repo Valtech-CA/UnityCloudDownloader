@@ -10,8 +10,6 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
-#include <QDebug>
-
 #define API(endPoint) QStringLiteral("https://build-api.cloud.unity3d.com/api/v1" endPoint)
 
 namespace ucd
@@ -84,6 +82,12 @@ void UnityApiClient::fetchBuilds(const QString &orgId, const QString &projectId,
 
     auto *reply = m_networkManager->get(request);
     connect(reply, &QNetworkReply::finished, this, &UnityApiClient::buildsReceived);
+}
+
+void UnityApiClient::preconnect()
+{
+    QNetworkAccessManager manager;
+    manager.connectToHostEncrypted(API(""));
 }
 
 void UnityApiClient::keyTestFinished()

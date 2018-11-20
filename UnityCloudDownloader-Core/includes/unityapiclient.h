@@ -34,6 +34,8 @@ public:
     Q_INVOKABLE void fetchBuildTargets(const QString &orgId, const QString &projectId);
     Q_INVOKABLE void fetchBuilds(const QString &orgId, const QString &porjectId, const QString &buildTargetId);
 
+    static void preconnect();
+
 signals:
     void apiKeyChanged(QString apiKey);
     void keyTested(bool isValid, QString apiKey);
