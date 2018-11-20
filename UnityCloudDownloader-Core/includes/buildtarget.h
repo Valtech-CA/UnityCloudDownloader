@@ -4,13 +4,17 @@
 #pragma once
 
 #include "unityclouddownloader-core_global.h"
+#include "build.h"
 
 #include <QMetaType>
 #include <QString>
 #include <QUuid>
+#include <QVector>
 
 namespace ucd
 {
+
+typedef QVector<Build> BuildList;
 
 class UCD_SHARED_EXPORT BuildTarget
 {
@@ -32,6 +36,7 @@ public:
     int minBuilds() const { return m_minBuilds; }
     int maxBuilds() const { return m_maxBuilds; }
     int maxDaysOld() const { return m_maxDaysOld; }
+    const BuildList& builds() const { return m_builds; }
 
     void setName(const QString &name);
     void setId(const QUuid &id);
@@ -42,6 +47,7 @@ public:
     void setMinBuilds(int value);
     void setMaxBuilds(int value);
     void setMaxDaysOld(int value);
+    void setBuilds(const BuildList &builds);
 
 private:
     QUuid m_id;
@@ -53,6 +59,7 @@ private:
     int m_minBuilds;
     int m_maxBuilds;
     int m_maxDaysOld;
+    BuildList m_builds;
 };
 
 }

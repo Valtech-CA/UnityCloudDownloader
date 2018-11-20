@@ -23,6 +23,7 @@ BuildTarget::BuildTarget(BuildTarget &&other) noexcept
     , m_minBuilds(other.m_minBuilds)
     , m_maxBuilds(other.m_maxBuilds)
     , m_maxDaysOld(other.m_maxDaysOld)
+    , m_builds(std::move(other.m_builds))
 {}
 
 BuildTarget &BuildTarget::operator=(const BuildTarget &other)
@@ -82,6 +83,11 @@ void BuildTarget::setMaxBuilds(int value)
 void BuildTarget::setMaxDaysOld(int value)
 {
     m_maxDaysOld = value;
+}
+
+void BuildTarget::setBuilds(const BuildList &builds)
+{
+    m_builds = builds;
 }
 
 } // namespace ucd

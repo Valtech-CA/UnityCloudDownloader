@@ -7,6 +7,8 @@
 #include "profilesmodel.h"
 #include "projectsmodel.h"
 #include "buildtargetsmodel.h"
+#include "build.h"
+#include "buildsmodel.h"
 
 #include <QApplication>
 #include <QMenu>
@@ -49,6 +51,8 @@ void SystemTrayIcon::onConfigure()
         qmlRegisterType<ucd::ProfilesModel>("ucd", 1, 0, "ProfilesModel");
         qmlRegisterType<ucd::ProjectsModel>("ucd", 1, 0, "ProjectsModel");
         qmlRegisterType<ucd::BuildTargetsModel>("ucd", 1, 0, "BuildTargetsModel");
+        qmlRegisterType<ucd::BuildsModel>("ucd", 1, 0, "BuildsModel");
+        qmlRegisterUncreatableMetaObject(ucd::Build::staticMetaObject, "ucd", 1, 0, "Build", "Cannot create Build object");
         m_qmlEngine = new QQmlApplicationEngine(this);
         m_qmlEngine->rootContext()->setContextObject(qmlContext);
         m_qmlEngine->rootContext()->setContextProperty("ucdDb", m_db);

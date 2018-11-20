@@ -17,7 +17,6 @@ namespace ucd
 BuildTargetsModel::BuildTargetsModel(QObject *parent)
         : QAbstractListModel(parent)
         , m_db(nullptr)
-        , m_hasSynced(false)
 {}
 
 BuildTargetsModel::~BuildTargetsModel()
@@ -228,13 +227,6 @@ void BuildTargetsModel::fetchMore(const QModelIndex &parent)
     connect(unityClient, &UnityApiClient::buildTargetsFetched, unityClient, &UnityApiClient::deleteLater);
     connect(unityClient, &UnityApiClient::buildTargetsFetched, this, &BuildTargetsModel::onBuildTargetsFetched);
     unityClient->fetchBuildTargets(project.organisationId(), project.cloudId());
-    m_hasSynced = true;
-}
-
-bool BuildTargetsModel::canFetchMore(const QModelIndex &parent) const
-{
-    Q_UNUSED(parent);
-    return !m_hasSynced;
 }
 
 void BuildTargetsModel::onBuildTargetsFetched(const QVector<BuildTarget> &buildTargets)

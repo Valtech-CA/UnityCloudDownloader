@@ -50,7 +50,6 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     void fetchMore(const QModelIndex &parent) override;
-    bool canFetchMore(const QModelIndex &parent) const override;
 
 signals:
     void databaseChanged(Database *database);
@@ -65,7 +64,6 @@ private:
     Database *m_db;
     QUuid m_profileId;
     QVector<Project> m_projects;
-    bool m_hasSynced;
 };
 
 }

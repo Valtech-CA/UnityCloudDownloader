@@ -1,6 +1,7 @@
 #include "buildtargetdao.h"
 
 #include "buildtarget.h"
+#include "builddao.h"
 
 #include <QVariant>
 #include <QSqlQuery>
@@ -80,7 +81,7 @@ void BuildTargetDao::removeBuildTarget(const QUuid &buildTargetId)
         throw std::runtime_error(query.lastError().text().toUtf8());
     }
 
-    // TODO: delete builds
+    BuildDao(m_db).removeBuilds(buildTargetId);
 }
 
 QVector<BuildTarget> BuildTargetDao::buildTargets(const QUuid &projectId, bool includeBuilds)
@@ -111,7 +112,7 @@ QVector<BuildTarget> BuildTargetDao::buildTargets(const QUuid &projectId, bool i
         buildTarget.setMaxDaysOld(query.value("maxDaysOld").toInt());
         if (includeBuilds)
         {
-            // TODO: add builds
+            buildTarget.setBuilds(BuildDao(m_db).builds(buildTarget.id()));
         }
         buildTargets.append(std::move(buildTarget));
     }
@@ -140,7 +141,7 @@ BuildTarget BuildTargetDao::buildTarget(const QUuid &buildTargetId, bool include
         buildTarget.setMaxDaysOld(query.value("maxDaysOld").toInt());
         if (includeBuilds)
         {
-            // TODO: inlcude builds
+            buildTarget.setBuilds(BuildDao(m_db).builds(buildTargetId));
         }
     }
     else

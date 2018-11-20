@@ -16,7 +16,6 @@ namespace ucd
 ProjectsModel::ProjectsModel(QObject *parent)
     : QAbstractListModel(parent)
     , m_db(nullptr)
-    , m_hasSynced(false)
 {}
 
 ProjectsModel::~ProjectsModel()
@@ -32,6 +31,7 @@ void ProjectsModel::setDatabase(Database *database)
     if (m_db != nullptr && !m_profileId.isNull())
     {
         m_projects = ProjectDao(m_db->sqlDatabase()).projects(m_profileId);
+        fetchMore(QModelIndex());
     }
     else
     {
@@ -52,6 +52,7 @@ void ProjectsModel::setProfileId(const QUuid &profileId)
     if (m_db != nullptr && !m_profileId.isNull())
     {
         m_projects = ProjectDao(m_db->sqlDatabase()).projects(m_profileId);
+        fetchMore(QModelIndex());
     }
     else
     {
@@ -100,7 +101,7 @@ int ProjectsModel::rowCount(const QModelIndex &parent) const
 QVariant ProjectsModel::data(const QModelIndex &index, int role) const
 {
     if (!isIndexValid(index))
-        return QVariant();
+        return {};
 
     const auto &project = m_projects.at(index.row());
 
@@ -124,7 +125,7 @@ QVariant ProjectsModel::data(const QModelIndex &index, int role) const
         break;
     }
 
-    return QVariant();
+    return {};
 }
 
 bool ProjectsModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -201,13 +202,6 @@ void ProjectsModel::fetchMore(const QModelIndex &parent)
     connect(unityClient, &UnityApiClient::projectsFetched, unityClient, &UnityApiClient::deleteLater);
     connect(unityClient, &UnityApiClient::projectsFetched, this, &ProjectsModel::onProjectsFetched);
     unityClient->fetchProjects();
-    m_hasSynced = true;
-}
-
-bool ProjectsModel::canFetchMore(const QModelIndex &parent) const
-{
-    Q_UNUSED(parent);
-    return !m_hasSynced;
 }
 
 void ProjectsModel::onProjectsFetched(const QVector<Project> &projects)

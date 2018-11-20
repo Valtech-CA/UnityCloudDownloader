@@ -2,6 +2,7 @@
 
 #include "project.h"
 #include "buildtarget.h"
+#include "build.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -154,7 +155,7 @@ void UnityApiClient::buildsReceived()
 {
     auto *reply = qobject_cast<QNetworkReply*>(sender());
     reply->deleteLater();
-    QVector<int> builds;
+    QVector<Build> builds;
 
     if (reply->error() == 0)
     {
@@ -163,7 +164,35 @@ void UnityApiClient::buildsReceived()
         auto jsonData = jsonDocument.array();
         for (QJsonValue value : jsonData)
         {
-            // TODO
+            Build build;
+            build.setId(value["build"].toInt());
+            build.setName(value["buildTargetName"].toString());
+            build.setStatus(Build::statusFromString(value["buildStatus"].toString()));
+            auto links = value["links"];
+            if (links.isObject())
+            {
+                auto icon = links["icon"];
+                if (icon.isObject())
+                {
+                    build.setIconPath(icon["href"].toString());
+                }
+            }
+            auto artifacts = value["artifacts"].toArray();
+            for (QJsonValue artifact : artifacts)
+            {
+                if (artifact["key"].toString() != QStringLiteral("primary"))
+                    continue;
+                auto files = artifact["files"].toArray();
+                if (!files.isEmpty())
+                {
+                    QJsonValue file = files[0];
+                    build.setArtifactName(file["name"].toString());
+                    build.setArtifactSize(file["size"].toVariant().toULongLong());
+                    build.setArtifactPath(file["href"].toString());
+                    break;
+                }
+                break;
+            }
         }
     }
 

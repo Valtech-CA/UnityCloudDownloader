@@ -1,5 +1,5 @@
-#ifndef UCD_BUILDTARGETSMODEL_H
-#define UCD_BUILDTARGETSMODEL_H
+#ifndef UCD_BUILDSMODEL_H
+#define UCD_BUILDSMODEL_H
 
 #pragma once
 
@@ -12,39 +12,39 @@
 namespace ucd
 {
 
-class BuildTarget;
+class Build;
 class Database;
 
-class UCD_SHARED_EXPORT BuildTargetsModel : public QAbstractListModel
+class UCD_SHARED_EXPORT BuildsModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(ucd::Database* database READ database WRITE setDatabase NOTIFY databaseChanged)
-    Q_PROPERTY(QUuid projectId READ projectId WRITE setProjectId NOTIFY projectIdChanged)
+    Q_PROPERTY(QUuid buildTargetId READ buildTargetId WRITE setBuildTargetId NOTIFY buildTargetIdChanged)
 public:
     enum Roles : int
     {
-        BuildTargetId = Qt::UserRole + 1,
-        ProjectId,
-        CloudId,
+        BuildNumber = Qt::UserRole + 1,
+        BuildTargetId,
         Name,
-        Platform,
-        Synchronize,
-        MinBuilds,
-        MaxBuilds,
-        MaxDaysOld,
+        Status,
+        IconPath,
+        ArtifactName,
+        ArtifactSize,
+        ArtifactPath,
+        ManualDownload,
     };
 
-    BuildTargetsModel(QObject *parent = nullptr);
-    virtual ~BuildTargetsModel() override;
+    BuildsModel(QObject *parent = nullptr);
+    virtual ~BuildsModel() override;
 
     Database* database() const { return m_db; }
     void setDatabase(Database *database);
 
-    QUuid projectId() const { return m_projectId; }
-    void setProjectId(const QUuid &projectId);
+    const QUuid& buildTargetId() const { return m_buildTargetId; }
+    void setBuildTargetId(const QUuid &buildTargetId);
 
-    bool updateBuildTarget(int row, const BuildTarget &buildTarget);
-    void addBuildTarget(const BuildTarget &buildTarget);
+    bool updateBuild(int row, const Build &build);
+    void addBuild(const Build &build);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -56,19 +56,18 @@ public:
 
 signals:
     void databaseChanged(Database *database);
-    void projectIdChanged(QUuid projectId);
+    void buildTargetIdChanged(QUuid buildTargetId);
 
 private slots:
-    void onBuildTargetsFetched(const QVector<BuildTarget> &buildTargets);
+    void onBuildsFetched(const QVector<Build> &builds);
 
 private:
     bool isIndexValid(const QModelIndex &index) const;
 
     Database *m_db;
-    QUuid m_projectId;
-    QVector<BuildTarget> m_buildTargets;
+    QUuid m_buildTargetId;
+    QVector<Build> m_builds;
 };
-
 }
 
-#endif // UCD_BUILDTARGETSMODEL_H
+#endif // UCD_BUILDSMODEL_H
