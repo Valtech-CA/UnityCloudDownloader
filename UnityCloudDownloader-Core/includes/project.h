@@ -19,12 +19,12 @@ class UCD_SHARED_EXPORT Project
 {
 public:
     Project();
-    Project(const Project &other);
-    Project(Project &&other);
-    ~Project();
+    Project(const Project &other) = default;
+    Project(Project &&other) noexcept;
+    ~Project() = default;
 
     Project& operator=(const Project &other);
-    Project& operator=(Project &&other);
+    Project& operator=(Project &&other) noexcept;
 
     const QString& name() const { return m_name; }
     const QUuid& id() const { return m_id; }

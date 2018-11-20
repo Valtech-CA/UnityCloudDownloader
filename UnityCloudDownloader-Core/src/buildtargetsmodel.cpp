@@ -16,6 +16,7 @@ namespace ucd
 
 BuildTargetsModel::BuildTargetsModel(QObject *parent)
         : QAbstractListModel(parent)
+        , m_db(nullptr)
         , m_hasSynced(false)
 {}
 
@@ -212,7 +213,7 @@ QHash<int, QByteArray> BuildTargetsModel::roleNames() const
 Qt::ItemFlags BuildTargetsModel::flags(const QModelIndex &index) const
 {
     if (!isIndexValid(index))
-        return Qt::ItemFlags();
+        return {};
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 }
 

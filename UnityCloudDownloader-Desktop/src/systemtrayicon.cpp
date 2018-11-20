@@ -39,9 +39,6 @@ SystemTrayIcon::SystemTrayIcon(ucd::Database *data, QObject *parent)
     setIcon(QIcon(":/icons/UnityCloudLogo2.png"));
 }
 
-SystemTrayIcon::~SystemTrayIcon()
-{}
-
 void SystemTrayIcon::onConfigure()
 {
     if (m_qmlEngine == nullptr)

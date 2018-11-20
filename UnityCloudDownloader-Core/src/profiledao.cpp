@@ -9,15 +9,8 @@
 namespace ucd
 {
 
-ProfileDao::ProfileDao(QSqlDatabase &&database)
-    : m_db(std::move(database))
-{}
-
-ProfileDao::ProfileDao(const QSqlDatabase &databse)
-    : m_db(databse)
-{}
-
-ProfileDao::~ProfileDao()
+ProfileDao::ProfileDao(const QSqlDatabase &database)
+    : m_db(database)
 {}
 
 void ProfileDao::init()

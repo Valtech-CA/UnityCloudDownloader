@@ -15,8 +15,7 @@ class BuildTargetDao
 {
 public:
     BuildTargetDao(const QSqlDatabase &database);
-    BuildTargetDao(QSqlDatabase &&database);
-    ~BuildTargetDao();
+    ~BuildTargetDao() = default;
 
     void init();
 

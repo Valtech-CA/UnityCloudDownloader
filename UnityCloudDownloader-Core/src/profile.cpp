@@ -9,23 +9,12 @@ Profile::Profile()
     : m_uuid(QUuid::createUuid())
 {}
 
-Profile::Profile(const Profile &other)
+Profile::Profile(Profile &&other) noexcept
     : m_uuid(other.m_uuid)
-    , m_name(other.m_name)
-    , m_apiKey(other.m_apiKey)
-    , m_rootPath(other.m_rootPath)
-    , m_projects(other.m_projects)
-{}
-
-Profile::Profile(Profile &&other)
-    : m_uuid(std::move(other.m_uuid))
     , m_name(std::move(other.m_name))
     , m_apiKey(std::move(other.m_apiKey))
     , m_rootPath(std::move(other.m_rootPath))
     , m_projects(std::move(other.m_projects))
-{}
-
-Profile::~Profile()
 {}
 
 Profile &Profile::operator=(const Profile &other)
@@ -35,7 +24,7 @@ Profile &Profile::operator=(const Profile &other)
     return *this;
 }
 
-Profile &Profile::operator=(Profile &&other)
+Profile &Profile::operator=(Profile &&other) noexcept
 {
     this->~Profile();
     new (this) Profile(std::move(other));

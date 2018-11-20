@@ -14,9 +14,8 @@ class Profile;
 class ProfileDao
 {
 public:
-    ProfileDao(QSqlDatabase &&database);
-    ProfileDao(const QSqlDatabase &databse);
-    ~ProfileDao();
+    ProfileDao(const QSqlDatabase &database);
+    ~ProfileDao() = default;
 
     void init();
 

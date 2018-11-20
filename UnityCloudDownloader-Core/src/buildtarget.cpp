@@ -13,21 +13,9 @@ BuildTarget::BuildTarget()
     , m_maxDaysOld(30)
 {}
 
-BuildTarget::BuildTarget(const BuildTarget &other)
+BuildTarget::BuildTarget(BuildTarget &&other) noexcept
     : m_id(other.m_id)
     , m_projectId(other.m_projectId)
-    , m_cloudId(other.m_cloudId)
-    , m_name(other.m_name)
-    , m_platform(other.m_platform)
-    , m_sync(other.m_sync)
-    , m_minBuilds(other.m_minBuilds)
-    , m_maxBuilds(other.m_maxBuilds)
-    , m_maxDaysOld(other.m_maxDaysOld)
-{}
-
-BuildTarget::BuildTarget(BuildTarget &&other)
-    : m_id(std::move(other.m_id))
-    , m_projectId(std::move(other.m_projectId))
     , m_cloudId(std::move(other.m_cloudId))
     , m_name(std::move(other.m_name))
     , m_platform(std::move(other.m_platform))
@@ -37,9 +25,6 @@ BuildTarget::BuildTarget(BuildTarget &&other)
     , m_maxDaysOld(other.m_maxDaysOld)
 {}
 
-BuildTarget::~BuildTarget()
-{}
-
 BuildTarget &BuildTarget::operator=(const BuildTarget &other)
 {
     this->~BuildTarget();
@@ -47,7 +32,7 @@ BuildTarget &BuildTarget::operator=(const BuildTarget &other)
     return *this;
 }
 
-BuildTarget &BuildTarget::operator=(BuildTarget &&other)
+BuildTarget &BuildTarget::operator=(BuildTarget &&other) noexcept
 {
     this->~BuildTarget();
     new (this) BuildTarget(std::move(other));

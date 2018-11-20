@@ -9,27 +9,14 @@ Project::Project()
     : m_id(QUuid::createUuid())
 {}
 
-Project::Project(const Project &other)
+Project::Project(Project &&other) noexcept
     : m_id(other.m_id)
     , m_profileId(other.m_profileId)
-    , m_cloudId(other.m_cloudId)
-    , m_name(other.m_name)
-    , m_orgId(other.m_orgId)
-    , m_iconPath(other.m_iconPath)
-    , m_buildTargets(other.m_buildTargets)
-{}
-
-Project::Project(Project &&other)
-    : m_id(std::move(other.m_id))
-    , m_profileId(std::move(other.m_profileId))
     , m_cloudId(std::move(other.m_cloudId))
     , m_name(std::move(other.m_name))
     , m_orgId(std::move(other.m_orgId))
     , m_iconPath(std::move(other.m_iconPath))
     , m_buildTargets(std::move(other.m_buildTargets))
-{}
-
-Project::~Project()
 {}
 
 Project &Project::operator=(const Project &other)
@@ -39,7 +26,7 @@ Project &Project::operator=(const Project &other)
     return *this;
 }
 
-Project &Project::operator=(Project &&other)
+Project &Project::operator=(Project &&other) noexcept
 {
     this->~Project();
     new (this) Project(std::move(other));

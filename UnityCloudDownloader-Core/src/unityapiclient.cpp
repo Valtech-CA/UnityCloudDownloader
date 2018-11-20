@@ -27,16 +27,13 @@ UnityApiClient::UnityApiClient(QObject *parent)
     m_networkManager = new QNetworkAccessManager(this);
 }
 
-UnityApiClient::UnityApiClient(const QString &apiKey, QObject *parent)
+UnityApiClient::UnityApiClient(QString apiKey, QObject *parent)
     : QObject(parent)
-    , m_apiKey(apiKey)
+    , m_apiKey(std::move(apiKey))
     , m_networkManager(nullptr)
 {
     m_networkManager = new QNetworkAccessManager(this);
 }
-
-UnityApiClient::~UnityApiClient()
-{}
 
 void UnityApiClient::setApiKey(const QString &apiKey)
 {

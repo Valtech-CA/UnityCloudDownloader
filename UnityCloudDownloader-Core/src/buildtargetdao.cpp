@@ -13,13 +13,6 @@ BuildTargetDao::BuildTargetDao(const QSqlDatabase &database)
     : m_db(database)
 {}
 
-BuildTargetDao::BuildTargetDao(QSqlDatabase &&database)
-    : m_db(std::move(database))
-{}
-
-BuildTargetDao::~BuildTargetDao()
-{}
-
 void BuildTargetDao::init()
 {
     QSqlQuery query(m_db);

@@ -22,8 +22,8 @@ class UCD_SHARED_EXPORT UnityApiClient : public QObject
     Q_PROPERTY(QString apiKey READ apiKey WRITE setApiKey NOTIFY apiKeyChanged)
 public:
     UnityApiClient(QObject *parent = nullptr);
-    UnityApiClient(const QString &apiKey, QObject *parent = nullptr);
-    virtual ~UnityApiClient() override;
+    UnityApiClient(QString apiKey, QObject *parent = nullptr);
+    virtual ~UnityApiClient() override = default;
 
     const QString& apiKey() const { return m_apiKey; }
     void setApiKey(const QString &apiKey);

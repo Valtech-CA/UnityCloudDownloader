@@ -16,12 +16,12 @@ class UCD_SHARED_EXPORT BuildTarget
 {
 public:
     BuildTarget();
-    BuildTarget(const BuildTarget &other);
-    BuildTarget(BuildTarget &&other);
-    ~BuildTarget();
+    BuildTarget(const BuildTarget &other) = default;
+    BuildTarget(BuildTarget &&other) noexcept;
+    ~BuildTarget() = default;
 
     BuildTarget& operator=(const BuildTarget &other);
-    BuildTarget& operator=(BuildTarget &&other);
+    BuildTarget& operator=(BuildTarget &&other) noexcept;
 
     const QString& name() const { return m_name; }
     const QUuid& id() const { return m_id; }

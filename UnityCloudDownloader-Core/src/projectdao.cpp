@@ -10,15 +10,8 @@
 namespace ucd
 {
 
-ProjectDao::ProjectDao(QSqlDatabase &&database)
-    : m_db(std::move(database))
-{}
-
 ProjectDao::ProjectDao(const QSqlDatabase &database)
     : m_db(database)
-{}
-
-ProjectDao::~ProjectDao()
 {}
 
 void ProjectDao::init()

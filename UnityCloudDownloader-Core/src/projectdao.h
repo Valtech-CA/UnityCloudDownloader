@@ -14,9 +14,8 @@ class Project;
 class ProjectDao
 {
 public:
-    ProjectDao(QSqlDatabase &&database);
     ProjectDao(const QSqlDatabase &database);
-    ~ProjectDao();
+    ~ProjectDao() = default;
 
     void init();
 

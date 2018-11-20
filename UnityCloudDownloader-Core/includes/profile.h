@@ -19,12 +19,12 @@ class UCD_SHARED_EXPORT Profile
 {
 public:
     Profile();
-    Profile(const Profile &other);
-    Profile(Profile &&other);
-    ~Profile();
+    Profile(const Profile &other) = default;
+    Profile(Profile &&other) noexcept;
+    ~Profile() = default;
 
     Profile& operator=(const Profile &other);
-    Profile& operator=(Profile &&other);
+    Profile& operator=(Profile &&other) noexcept;
 
     const QUuid& uuid() const { return m_uuid; }
     const QString& name() const { return m_name; }

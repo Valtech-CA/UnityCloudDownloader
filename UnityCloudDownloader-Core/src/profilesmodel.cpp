@@ -11,6 +11,7 @@ namespace ucd
 
 ProfilesModel::ProfilesModel(QObject *parent)
     : QAbstractListModel(parent)
+    , m_db(nullptr)
 {}
 
 ProfilesModel::ProfilesModel(Database *data, QObject *parent)
@@ -157,7 +158,7 @@ QHash<int, QByteArray> ProfilesModel::roleNames() const
 Qt::ItemFlags ProfilesModel::flags(const QModelIndex &index) const
 {
     if (!isIndexValid(index))
-        return Qt::ItemFlags();
+        return {};
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 }
 

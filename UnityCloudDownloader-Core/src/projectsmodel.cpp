@@ -15,6 +15,7 @@ namespace ucd
 
 ProjectsModel::ProjectsModel(QObject *parent)
     : QAbstractListModel(parent)
+    , m_db(nullptr)
     , m_hasSynced(false)
 {}
 
@@ -186,7 +187,7 @@ QHash<int, QByteArray> ProjectsModel::roleNames() const
 Qt::ItemFlags ProjectsModel::flags(const QModelIndex &index) const
 {
     if (!isIndexValid(index))
-        return Qt::ItemFlags();
+        return {};
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 }
 
