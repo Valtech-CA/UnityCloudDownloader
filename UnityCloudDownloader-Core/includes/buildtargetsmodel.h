@@ -28,6 +28,10 @@ public:
         CloudId,
         Name,
         Platform,
+        Synchronize,
+        MinBuilds,
+        MaxBuilds,
+        MaxDaysOld,
     };
 
     BuildTargetsModel(QObject *parent = nullptr);

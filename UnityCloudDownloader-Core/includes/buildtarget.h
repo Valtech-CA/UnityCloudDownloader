@@ -28,12 +28,20 @@ public:
     const QUuid& projectId() const { return m_projectId; }
     const QString& cloudId() const { return m_cloudId; }
     const QString& platform() const { return m_platform; }
+    bool sync() const { return m_sync; }
+    int minBuilds() const { return m_minBuilds; }
+    int maxBuilds() const { return m_maxBuilds; }
+    int maxDaysOld() const { return m_maxDaysOld; }
 
     void setName(const QString &name);
     void setId(const QUuid &id);
     void setProjectId(const QUuid &projectId);
     void setCloudId(const QString &cloudId);
     void setPlatform(const QString &platform);
+    void setSync(bool value);
+    void setMinBuilds(int value);
+    void setMaxBuilds(int value);
+    void setMaxDaysOld(int value);
 
 private:
     QUuid m_id;
@@ -41,6 +49,10 @@ private:
     QString m_cloudId;
     QString m_name;
     QString m_platform;
+    bool m_sync;
+    int m_minBuilds;
+    int m_maxBuilds;
+    int m_maxDaysOld;
 };
 
 }

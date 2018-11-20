@@ -118,6 +118,14 @@ QVariant BuildTargetsModel::data(const QModelIndex &index, int role) const
         return buildTarget.cloudId();
     case Roles::Platform:
         return buildTarget.platform();
+    case Roles::Synchronize:
+        return buildTarget.sync();
+    case Roles::MinBuilds:
+        return buildTarget.minBuilds();
+    case Roles::MaxBuilds:
+        return buildTarget.maxBuilds();
+    case Roles::MaxDaysOld:
+        return buildTarget.maxDaysOld();
     default:
         break;
     }
@@ -142,6 +150,22 @@ bool BuildTargetsModel::setData(const QModelIndex &index, const QVariant &value,
     case Roles::Platform:
         buildTarget.setPlatform(value.toString());
         emit dataChanged(index, index, QVector<int>{ Roles::Platform });
+        break;
+    case Roles::Synchronize:
+        buildTarget.setSync(value.toBool());
+        emit dataChanged(index, index, QVector<int>{ Roles::Synchronize });
+        break;
+    case Roles::MinBuilds:
+        buildTarget.setMinBuilds(value.toInt());
+        emit dataChanged(index, index, QVector<int>{ Roles::MinBuilds });
+        break;
+    case Roles::MaxBuilds:
+        buildTarget.setMaxBuilds(value.toInt());
+        emit dataChanged(index, index, QVector<int>{ Roles::MaxBuilds });
+        break;
+    case Roles::MaxDaysOld:
+        buildTarget.setMaxDaysOld(value.toInt());
+        emit dataChanged(index, index, QVector<int>{ Roles::MaxDaysOld });
         break;
     default:
         return false;
@@ -178,6 +202,10 @@ QHash<int, QByteArray> BuildTargetsModel::roleNames() const
     roles[Roles::ProjectId] = "projectId";
     roles[Roles::CloudId] = "cloudId";
     roles[Roles::Platform] = "platform";
+    roles[Roles::Synchronize] = "sync";
+    roles[Roles::MinBuilds] = "minBuilds";
+    roles[Roles::MaxBuilds] = "maxBuilds";
+    roles[Roles::MaxDaysOld] = "maxDaysOld";
     return roles;
 }
 

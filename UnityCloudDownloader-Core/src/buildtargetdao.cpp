@@ -23,19 +23,35 @@ BuildTargetDao::~BuildTargetDao()
 void BuildTargetDao::init()
 {
     QSqlQuery query(m_db);
-    query.exec("CREATE TABLE IF NOT EXISTS BuildTargets (buildTargetId TEXT PRIMARY KEY, projectId TEXT, cloudId TEXT, name TEXT, platform TEXT)");
+    query.exec("CREATE TABLE IF NOT EXISTS BuildTargets ("
+               "buildTargetId TEXT PRIMARY KEY, "
+               "projectId TEXT, "
+               "cloudId TEXT, "
+               "name TEXT, "
+               "platform TEXT, "
+               "sync BOOLEAN, "
+               "minBuilds INT, "
+               "maxBuilds INT, "
+               "maxDaysOld INT)");
 }
 
 void BuildTargetDao::addBuildTarget(const BuildTarget &buildTarget)
 {
     QSqlQuery query(m_db);
-    query.prepare("INSERT INTO BuildTargets (buildTargetId, projectId, cloudId, name, platform) "
-                  "VALUES (:buildTargetId, :projectId, :cloudId, :name, :platform)");
+    query.prepare("INSERT INTO BuildTargets ("
+                  "buildTargetId, projectId, cloudId, name, platform, "
+                  "sync, minBuilds, maxBuilds, maxDaysOld) "
+                  "VALUES (:buildTargetId, :projectId, :cloudId, :name, :platform, "
+                  ":sync, :minBuilds, :maxBuilds, :maxDaysOld)");
     query.bindValue(":buildTargetId", buildTarget.id().toString());
     query.bindValue(":projectId", buildTarget.projectId().toString());
     query.bindValue(":cloudId", buildTarget.cloudId());
     query.bindValue(":name", buildTarget.name());
     query.bindValue(":platform", buildTarget.platform());
+    query.bindValue(":sync", buildTarget.sync());
+    query.bindValue(":minBuilds", buildTarget.minBuilds());
+    query.bindValue(":maxBuilds", buildTarget.maxBuilds());
+    query.bindValue(":maxDaysOld", buildTarget.maxDaysOld());
     if (!query.exec())
     {
         throw std::runtime_error(query.lastError().text().toUtf8());
@@ -45,11 +61,16 @@ void BuildTargetDao::addBuildTarget(const BuildTarget &buildTarget)
 void BuildTargetDao::updateBuildTarget(const BuildTarget &buildTarget)
 {
     QSqlQuery query(m_db);
-    query.prepare("UPDATE BuildTargets SET name = :name, platform = :platform "
+    query.prepare("UPDATE BuildTargets SET name = :name, platform = :platform, "
+                  "sync = :sync, minBuilds = :minBuilds, maxBuilds = :maxBuilds, maxDaysOld = :maxDaysOld "
                   "WHERE buildTargetId = :buildTargetId");
     query.bindValue(":name", buildTarget.name());
     query.bindValue(":platform", buildTarget.platform());
     query.bindValue(":buildTargetId", buildTarget.id());
+    query.bindValue(":sync", buildTarget.sync());
+    query.bindValue(":minBuilds", buildTarget.minBuilds());
+    query.bindValue(":maxBuilds", buildTarget.maxBuilds());
+    query.bindValue(":maxDaysOld", buildTarget.maxDaysOld());
     if (!query.exec())
     {
         throw std::runtime_error(query.lastError().text().toUtf8());
@@ -91,6 +112,10 @@ QVector<BuildTarget> BuildTargetDao::buildTargets(const QUuid &projectId, bool i
         buildTarget.setCloudId(query.value("cloudId").toString());
         buildTarget.setName(query.value("name").toString());
         buildTarget.setPlatform(query.value("platform").toString());
+        buildTarget.setSync(query.value("sync").toBool());
+        buildTarget.setMinBuilds(query.value("minBuilds").toInt());
+        buildTarget.setMaxBuilds(query.value("maxBuilds").toInt());
+        buildTarget.setMaxDaysOld(query.value("maxDaysOld").toInt());
         if (includeBuilds)
         {
             // TODO: add builds
@@ -116,6 +141,10 @@ BuildTarget BuildTargetDao::buildTarget(const QUuid &buildTargetId, bool include
         buildTarget.setCloudId(query.value("cloudId").toString());
         buildTarget.setName(query.value("name").toString());
         buildTarget.setPlatform(query.value("platform").toString());
+        buildTarget.setSync(query.value("sync").toBool());
+        buildTarget.setMinBuilds(query.value("minBuilds").toInt());
+        buildTarget.setMaxBuilds(query.value("maxBuilds").toInt());
+        buildTarget.setMaxDaysOld(query.value("maxDaysOld").toInt());
         if (includeBuilds)
         {
             // TODO: inlcude builds

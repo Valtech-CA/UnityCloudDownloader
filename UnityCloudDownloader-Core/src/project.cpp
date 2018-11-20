@@ -34,12 +34,14 @@ Project::~Project()
 
 Project &Project::operator=(const Project &other)
 {
+    this->~Project();
     new (this) Project(other);
     return *this;
 }
 
 Project &Project::operator=(Project &&other)
 {
+    this->~Project();
     new (this) Project(std::move(other));
     return *this;
 }

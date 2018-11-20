@@ -55,6 +55,10 @@ ItemDelegate {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: arrow.left
             anchors.rightMargin: 10
+            Component.onCompleted: {
+                checked = sync
+                checkedChanged.connect(function() { sync = checked })
+            }
         }
 
         ArrowButton {
@@ -109,6 +113,10 @@ ItemDelegate {
                     id: maxSpin
                     from: minSpin.value
                     editable: true
+                    Component.onCompleted: {
+                        value = maxBuilds
+                        valueChanged.connect(function() { maxBuilds = value })
+                    }
                 }
 
                 Text {
@@ -121,6 +129,10 @@ ItemDelegate {
                     id: minSpin
                     from: 1
                     editable: true
+                    Component.onCompleted: {
+                        value = minBuilds
+                        valueChanged.connect(function() { minBuilds = value });
+                    }
                 }
 
                 Text {
@@ -134,6 +146,10 @@ ItemDelegate {
                     from: 1
                     to: 365
                     editable: true
+                    Component.onCompleted: {
+                        value = maxDaysOld
+                        valueChanged.connect(function() { maxDaysOld = value; })
+                    }
                 }
 
                 Item {

@@ -30,12 +30,14 @@ Profile::~Profile()
 
 Profile &Profile::operator=(const Profile &other)
 {
+    this->~Profile();
     new (this) Profile(other);
     return *this;
 }
 
 Profile &Profile::operator=(Profile &&other)
 {
+    this->~Profile();
     new (this) Profile(std::move(other));
     return *this;
 }
