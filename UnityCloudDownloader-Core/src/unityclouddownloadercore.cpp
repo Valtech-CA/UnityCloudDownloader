@@ -3,6 +3,7 @@
 #include "profile.h"
 #include "project.h"
 #include "buildtarget.h"
+#include "build.h"
 #include "unityapiclient.h"
 
 #include <QObject>
@@ -19,6 +20,8 @@ void Core::init()
     qRegisterMetaTypeStreamOperators<Project>("ucd_Project");
     qRegisterMetaType<BuildTarget>("ucd_BuildTarget");
     qRegisterMetaTypeStreamOperators<BuildTarget>("ucd_BuildTarget");
+    qRegisterMetaType<Build>("ucd_Build");
+    //qRegisterMetaTypeStreamOperators<Build>("ucd_Build");
     QtConcurrent::run(&UnityApiClient::preconnect);
 }
 

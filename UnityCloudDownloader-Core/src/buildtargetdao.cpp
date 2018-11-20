@@ -17,7 +17,7 @@ BuildTargetDao::BuildTargetDao(const QSqlDatabase &database)
 void BuildTargetDao::init()
 {
     QSqlQuery query(m_db);
-    query.exec("CREATE TABLE IF NOT EXISTS BuildTargets ("
+    if (!query.exec("CREATE TABLE IF NOT EXISTS BuildTargets ("
                "buildTargetId TEXT PRIMARY KEY, "
                "projectId TEXT, "
                "cloudId TEXT, "
@@ -26,7 +26,12 @@ void BuildTargetDao::init()
                "sync BOOLEAN, "
                "minBuilds INT, "
                "maxBuilds INT, "
-               "maxDaysOld INT)");
+               "maxDaysOld INT)"))
+    {
+        auto error = query.lastError().text().toUtf8();
+        qFatal(error);
+        throw std::runtime_error(error);
+    }
 }
 
 void BuildTargetDao::addBuildTarget(const BuildTarget &buildTarget)
@@ -48,7 +53,9 @@ void BuildTargetDao::addBuildTarget(const BuildTarget &buildTarget)
     query.bindValue(":maxDaysOld", buildTarget.maxDaysOld());
     if (!query.exec())
     {
-        throw std::runtime_error(query.lastError().text().toUtf8());
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
     }
 }
 
@@ -67,7 +74,9 @@ void BuildTargetDao::updateBuildTarget(const BuildTarget &buildTarget)
     query.bindValue(":maxDaysOld", buildTarget.maxDaysOld());
     if (!query.exec())
     {
-        throw std::runtime_error(query.lastError().text().toUtf8());
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
     }
 }
 
@@ -78,7 +87,9 @@ void BuildTargetDao::removeBuildTarget(const QUuid &buildTargetId)
     query.bindValue(":buildTargetId", buildTargetId.toString());
     if (!query.exec())
     {
-        throw std::runtime_error(query.lastError().text().toUtf8());
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
     }
 
     BuildDao(m_db).removeBuilds(buildTargetId);

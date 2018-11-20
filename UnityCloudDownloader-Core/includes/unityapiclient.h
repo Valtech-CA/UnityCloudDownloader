@@ -41,7 +41,7 @@ signals:
     void keyTested(bool isValid, QString apiKey);
     void projectsFetched(QVector<Project> projects);
     void buildTargetsFetched(QVector<BuildTarget> buildTargets);
-    void buildsFetched();
+    void buildsFetched(QVector<Build> builds);
 
 private slots:
     void keyTestFinished();

@@ -4,6 +4,7 @@
 #include "projectdao.h"
 
 #include <QSqlQuery>
+#include <QSqlError>
 #include <QVariant>
 
 namespace ucd
@@ -16,8 +17,13 @@ ProfileDao::ProfileDao(const QSqlDatabase &database)
 void ProfileDao::init()
 {
     QSqlQuery query(m_db);
-    query.exec("CREATE TABLE IF NOT EXISTS "
-               "Profiles (profileId TEXT PRIMARY KEY, name TEXT, rootPath TEXT, apiKey TEXT)");
+    if (!query.exec("CREATE TABLE IF NOT EXISTS "
+               "Profiles (profileId TEXT PRIMARY KEY, name TEXT, rootPath TEXT, apiKey TEXT)"))
+    {
+        auto error = query.lastError().text().toUtf8();
+        qFatal(error);
+        throw std::runtime_error(error);
+    }
 }
 
 void ProfileDao::addProfile(const Profile &profile)
@@ -29,7 +35,12 @@ void ProfileDao::addProfile(const Profile &profile)
     query.bindValue(":name", profile.name());
     query.bindValue(":rootPath", profile.rootPath());
     query.bindValue(":apiKey", profile.apiKey());
-    query.exec();
+    if (!query.exec())
+    {
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
+    }
 }
 
 void ProfileDao::updateProfile(const Profile &profile)
@@ -41,7 +52,12 @@ void ProfileDao::updateProfile(const Profile &profile)
     query.bindValue(":name", profile.name());
     query.bindValue(":rootPath", profile.rootPath());
     query.bindValue(":apiKey", profile.apiKey());
-    query.exec();
+    if (!query.exec())
+    {
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
+    }
 }
 
 void ProfileDao::removeProfile(const QUuid &profileId)
@@ -49,7 +65,12 @@ void ProfileDao::removeProfile(const QUuid &profileId)
     QSqlQuery query(m_db);
     query.prepare("DELETE FROM Profiles WHERE profileId = :profileId");
     query.bindValue(":profileId", profileId.toString());
-    query.exec();
+    if (!query.exec())
+    {
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
+    }
 
     ProjectDao(m_db).removeProjects(profileId);
 }

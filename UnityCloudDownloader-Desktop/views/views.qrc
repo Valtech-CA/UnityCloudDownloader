@@ -15,5 +15,7 @@
         <file>BackNavigationBar.qml</file>
         <file>BuildTargetDelegate.qml</file>
         <file>ItemHighlight.qml</file>
+        <file>BuildList.qml</file>
+        <file>BuildDelegate.qml</file>
     </qresource>
 </RCC>

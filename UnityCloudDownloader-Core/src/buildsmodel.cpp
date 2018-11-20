@@ -89,7 +89,7 @@ void BuildsModel::addBuild(const Build &build)
     beginInsertRows(QModelIndex(), m_builds.size(), m_builds.size());
     Build newBuild(build);
     newBuild.setBuildTargetId(m_buildTargetId);
-    BuildDao(m_db->sqlDatabase()).addBuild(build);
+    BuildDao(m_db->sqlDatabase()).addBuild(newBuild);
     m_builds.append(std::move(newBuild));
     endInsertRows();
 }
@@ -203,6 +203,15 @@ Qt::ItemFlags BuildsModel::flags(const QModelIndex &index) const
 void BuildsModel::fetchMore(const QModelIndex &parent)
 {
     Q_UNUSED(parent);
+
+    auto buildTarget = BuildTargetDao(m_db->sqlDatabase()).buildTarget(m_buildTargetId);
+    auto project = ProjectDao(m_db->sqlDatabase()).project(buildTarget.projectId());
+    auto apiKey = ProfileDao(m_db->sqlDatabase()).getApiKey(project.profileId());
+    auto *unityClient = new UnityApiClient(apiKey, this);
+
+    connect(unityClient, &UnityApiClient::buildsFetched, unityClient, &UnityApiClient::deleteLater);
+    connect(unityClient, &UnityApiClient::buildsFetched, this, &BuildsModel::onBuildsFetched);
+    unityClient->fetchBuilds(project.organisationId(), project.cloudId(), buildTarget.cloudId());
 }
 
 void BuildsModel::onBuildsFetched(const QVector<Build> &builds)

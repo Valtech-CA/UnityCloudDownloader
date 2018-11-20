@@ -70,7 +70,7 @@ ItemDelegate {
             anchors.verticalCenter: parent.verticalCenter
 
             onClicked: {
-
+                mainStack.push("./BuildList.qml", { "buildTargetId": buildTargetId })
             }
         }
     }

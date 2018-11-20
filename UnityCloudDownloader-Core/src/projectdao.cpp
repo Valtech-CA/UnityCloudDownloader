@@ -17,7 +17,18 @@ ProjectDao::ProjectDao(const QSqlDatabase &database)
 void ProjectDao::init()
 {
     QSqlQuery query(m_db);
-    query.exec("CREATE TABLE IF NOT EXISTS Projects (projectId TEXT PRIMARY KEY, profileId TEXT, cloudId TEXT, name TEXT, orgId TEXT, iconPath TEXT)");
+    if (!query.exec("CREATE TABLE IF NOT EXISTS Projects ("
+                    "projectId TEXT PRIMARY KEY, "
+                    "profileId TEXT, "
+                    "cloudId TEXT, "
+                    "name TEXT, "
+                    "orgId TEXT, "
+                    "iconPath TEXT)"))
+    {
+        auto error = query.lastError().text().toUtf8();
+        qFatal(error);
+        throw std::runtime_error(error);
+    }
 }
 
 void ProjectDao::addProject(const Project &project)
@@ -33,7 +44,9 @@ void ProjectDao::addProject(const Project &project)
     query.bindValue(":iconPath", project.iconPath());
     if (!query.exec())
     {
-        throw std::runtime_error(query.lastError().text().toUtf8());
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
     }
 }
 
@@ -47,7 +60,9 @@ void ProjectDao::updateProject(const Project &project)
     query.bindValue(":projectId", project.id());
     if (!query.exec())
     {
-        throw std::runtime_error(query.lastError().text().toUtf8());
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
     }
 }
 
@@ -58,7 +73,9 @@ void ProjectDao::removeProject(const QUuid &projectId)
     query.bindValue(":projectId", projectId);
     if (!query.exec())
     {
-        throw std::runtime_error(query.lastError().text().toUtf8());
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
     }
 
     BuildTargetDao(m_db).removeBuildTargets(projectId);

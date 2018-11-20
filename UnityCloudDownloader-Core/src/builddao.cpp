@@ -18,7 +18,7 @@ BuildDao::BuildDao(const QSqlDatabase &database)
 void BuildDao::init()
 {
     QSqlQuery query(m_db);
-    query.exec("CREATE TABLE IF NOT EXISTS Builds ("
+    if (!query.exec("CREATE TABLE IF NOT EXISTS Builds ("
                "buildNumber INT, "
                "buildTargetId TEXT, "
                "status TINYINT, "
@@ -27,8 +27,13 @@ void BuildDao::init()
                "artifactName TEXT, "
                "artifactSize BIGINT, "
                "artifactPath TEXT, "
-               "manualDownload BOOLEAN,"
-               "PRIMARY KEY(buildNumber, buildTargtId))");
+               "manualDownload BOOLEAN, "
+               "PRIMARY KEY(buildNumber, buildTargetId))"))
+    {
+        auto error = query.lastError().text().toUtf8();
+        qFatal(error);
+        throw std::runtime_error(error);
+    }
 }
 
 void BuildDao::addBuild(const Build &build)
@@ -52,7 +57,9 @@ void BuildDao::addBuild(const Build &build)
     query.bindValue(":manualDownload", build.manualDownload());
     if (!query.exec())
     {
-        throw std::runtime_error(query.lastError().text().toUtf8());
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
     }
 }
 
@@ -78,7 +85,9 @@ void BuildDao::updateBuild(const Build &build)
     query.bindValue(":buildtargetId", build.buildTargetId().toString());
     if (!query.exec())
     {
-        throw std::runtime_error(query.lastError().text().toUtf8());
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
     }
 }
 
@@ -92,7 +101,9 @@ void BuildDao::removeBuild(const Build &build)
     query.bindValue(":buildTargetId", build.buildTargetId().toString());
     if (!query.exec())
     {
-        throw std::runtime_error(query.lastError().text().toUtf8());
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
     }
 }
 
@@ -135,7 +146,9 @@ void BuildDao::removeBuilds(const QUuid &buildTargetId)
     query.bindValue(":buildTargetId", buildTargetId.toString());
     if (!query.exec())
     {
-        throw std::runtime_error(query.lastError().text().toUtf8());
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
     }
 }
 

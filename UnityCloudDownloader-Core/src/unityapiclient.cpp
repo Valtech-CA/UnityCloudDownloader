@@ -193,10 +193,12 @@ void UnityApiClient::buildsReceived()
                 }
                 break;
             }
+
+            builds.append(std::move(build));
         }
     }
 
-    emit buildsFetched();
+    emit buildsFetched(builds);
 }
 
 }
