@@ -43,7 +43,8 @@ SOURCES += \
     src/buildtargetsmodel.cpp \
     src/build.cpp \
     src/buildsmodel.cpp \
-    src/builddao.cpp
+    src/builddao.cpp \
+    src/isynchronizer.cpp
 
 HEADERS += \
     includes/unityclouddownloader-core_global.h \
@@ -61,7 +62,8 @@ HEADERS += \
     includes/buildtargetsmodel.h \
     includes/build.h \
     includes/buildsmodel.h \
-    src/builddao.h
+    src/builddao.h \
+    includes/isynchronizer.h
 
 unix {
     target.path = /usr/lib
