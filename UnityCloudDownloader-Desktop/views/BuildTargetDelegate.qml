@@ -33,19 +33,17 @@ ItemDelegate {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 2
 
-            Text {
+            Label {
                 id: nameText
                 text: name
                 font.pointSize: 24
-                color: Material.foreground
             }
 
-            Text {
+            Label {
                 id: platformText
-                text: platform
+                text: cloudId + ": " + platform
                 font.italic: true
                 font.pointSize: 14
-                color: Material.foreground
             }
         }
 
@@ -103,9 +101,8 @@ ItemDelegate {
                 anchors.left: parent.left
                 columns: 4
 
-                Text {
+                Label {
                     text: qsTr("max")
-                    color: Material.foreground
                     Layout.alignment: Qt.AlignRight
                 }
 
@@ -119,9 +116,8 @@ ItemDelegate {
                     }
                 }
 
-                Text {
+                Label {
                     text: qsTr("min")
-                    color: Material.foreground
                     Layout.alignment: Qt.AlignRight
                 }
 
@@ -135,9 +131,8 @@ ItemDelegate {
                     }
                 }
 
-                Text {
+                Label {
                     text: qsTr("days")
-                    color: Material.foreground
                     Layout.alignment: Qt.AlignRight
                 }
 
