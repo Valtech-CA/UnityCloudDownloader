@@ -8,6 +8,7 @@
 #include <QMetaType>
 #include <QString>
 #include <QUuid>
+#include <QDateTime>
 
 namespace ucd
 {
@@ -46,6 +47,7 @@ public:
     int id() const { return m_buildNumber; }
     Status status() const { return m_status; }
     const QUuid& buildTargetId() const { return m_buildTargetId; }
+    const QDateTime createTime() const { return m_createTime; }
     const QString& iconPath() const { return m_iconPath; }
     const QString& artifactName() const { return m_artifactName; }
     uint64_t artifactSize() const { return m_artifactSize; }
@@ -56,6 +58,7 @@ public:
     void setId(int id);
     void setStatus(int status);
     void setBuildTargetId(const QUuid &buildTargetId);
+    void setCreateTime(const QDateTime &createTime);
     void setIconPath(QString iconPath);
     void setArtifactName(QString artifactName);
     void setArtifactSize(uint64_t size);
@@ -67,6 +70,7 @@ private:
     Status m_status;
     QUuid m_buildTargetId;
     QString m_name;
+    QDateTime m_createTime;
     QString m_iconPath;
     QString m_artifactName;
     uint64_t m_artifactSize;

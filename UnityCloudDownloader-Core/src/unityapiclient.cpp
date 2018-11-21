@@ -168,6 +168,7 @@ void UnityApiClient::buildsReceived()
             build.setId(value["build"].toInt());
             build.setName(value["buildTargetName"].toString());
             build.setStatus(Build::statusFromString(value["buildStatus"].toString()));
+            build.setCreateTime(value["created"].toVariant().toDateTime());
             auto links = value["links"];
             if (links.isObject())
             {
@@ -176,22 +177,22 @@ void UnityApiClient::buildsReceived()
                 {
                     build.setIconPath(icon["href"].toString());
                 }
-            }
-            auto artifacts = value["artifacts"].toArray();
-            for (QJsonValue artifact : artifacts)
-            {
-                if (artifact["key"].toString() != QStringLiteral("primary"))
-                    continue;
-                auto files = artifact["files"].toArray();
-                if (!files.isEmpty())
+                auto artifacts = links["artifacts"].toArray();
+                for (QJsonValue artifact : artifacts)
                 {
-                    QJsonValue file = files[0];
-                    build.setArtifactName(file["name"].toString());
-                    build.setArtifactSize(file["size"].toVariant().toULongLong());
-                    build.setArtifactPath(file["href"].toString());
+                    if (artifact["key"].toString() != QStringLiteral("primary"))
+                        continue;
+                    auto files = artifact["files"].toArray();
+                    if (!files.isEmpty())
+                    {
+                        QJsonValue file = files[0];
+                        build.setArtifactName(file["filename"].toString());
+                        build.setArtifactSize(file["size"].toVariant().toULongLong());
+                        build.setArtifactPath(file["href"].toString());
+                        break;
+                    }
                     break;
                 }
-                break;
             }
 
             builds.append(std::move(build));

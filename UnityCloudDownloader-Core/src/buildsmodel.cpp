@@ -86,11 +86,21 @@ bool BuildsModel::updateBuild(int row, const Build &build)
 
 void BuildsModel::addBuild(const Build &build)
 {
-    beginInsertRows(QModelIndex(), m_builds.size(), m_builds.size());
+    // we insert builds by descending build number
+
+    auto insertIt = std::find_if(
+                        std::begin(m_builds),
+                        std::end(m_builds),
+                        [build](const auto &other) -> bool { return other.id() < build.id(); });
+
+    auto index = static_cast<int>(insertIt - std::begin(m_builds));
+
+
+    beginInsertRows(QModelIndex(), index, index);
     Build newBuild(build);
     newBuild.setBuildTargetId(m_buildTargetId);
     BuildDao(m_db->sqlDatabase()).addBuild(newBuild);
-    m_builds.append(std::move(newBuild));
+    m_builds.insert(index, std::move(newBuild));
     endInsertRows();
 }
 
@@ -119,6 +129,8 @@ QVariant BuildsModel::data(const QModelIndex &index, int role) const
         return build.buildTargetId();
     case Roles::Status:
         return build.status();
+    case Roles::CreateTime:
+        return build.createTime();
     case Roles::IconPath:
         return build.iconPath();
     case Roles::ArtifactName:
@@ -185,7 +197,8 @@ QHash<int, QByteArray> BuildsModel::roleNames() const
     roles[Roles::BuildNumber] = "buildNumber";
     roles[Roles::BuildTargetId] = "buildTargetId";
     roles[Roles::Name] = "name";
-    roles[Roles::Status] = "status";
+    roles[Roles::Status] = "buildStatus";
+    roles[Roles::CreateTime] = "createTime";
     roles[Roles::IconPath] = "iconPath";
     roles[Roles::ArtifactName] = "artifactName";
     roles[Roles::ArtifactSize] = "artifactSize";

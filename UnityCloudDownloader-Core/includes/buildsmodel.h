@@ -27,6 +27,7 @@ public:
         BuildTargetId,
         Name,
         Status,
+        CreateTime,
         IconPath,
         ArtifactName,
         ArtifactSize,

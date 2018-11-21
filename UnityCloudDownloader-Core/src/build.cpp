@@ -9,7 +9,7 @@ Build::Status Build::statusFromString(const QString &value)
         return Status::Queued;
     if (value == QStringLiteral("sentToBuilder"))
         return Status::SentToBuilder;
-    if (value == QStringLiteral("starter"))
+    if (value == QStringLiteral("started"))
         return Status::Started;
     if (value == QStringLiteral("restarted"))
         return Status::Restarted;
@@ -72,6 +72,11 @@ void Build::setStatus(int status)
 void Build::setBuildTargetId(const QUuid &buildTargetId)
 {
     m_buildTargetId = buildTargetId;
+}
+
+void Build::setCreateTime(const QDateTime &createTime)
+{
+    m_createTime = createTime;
 }
 
 void Build::setIconPath(QString iconPath)

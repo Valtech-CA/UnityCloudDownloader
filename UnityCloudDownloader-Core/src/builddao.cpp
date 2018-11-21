@@ -23,6 +23,7 @@ void BuildDao::init()
                "buildTargetId TEXT, "
                "status TINYINT, "
                "name TEXT, "
+               "createTime DATETIME, "
                "iconPath TEXT, "
                "artifactName TEXT, "
                "artifactSize BIGINT, "
@@ -41,15 +42,16 @@ void BuildDao::addBuild(const Build &build)
     QSqlQuery query(m_db);
     query.prepare("INSERT INTO Builds ("
                   "buildNumber, buildTargetId, status, name, "
-                  "iconPath, artifactName, artifactSize, "
+                  "createTime, iconPath, artifactName, artifactSize, "
                   "artifactPath, manualDownload)"
                   "VALUES (:buildNumber, :buildTargetId, :status, :name, "
-                  ":iconPath, :artifactName, :artifactSize, "
+                  ":createTime, :iconPath, :artifactName, :artifactSize, "
                   ":artifactPath, :manualDownload)");
     query.bindValue(":buildNumber", build.id());
     query.bindValue(":buildTargetId", build.buildTargetId());
     query.bindValue(":status", build.status());
     query.bindValue(":name", build.name());
+    query.bindValue(":createTime", build.createTime());
     query.bindValue(":iconPath", build.iconPath());
     query.bindValue(":artifactName", build.artifactName());
     query.bindValue(":artifactSize", build.artifactSize());
@@ -72,7 +74,7 @@ void BuildDao::updateBuild(const Build &build)
                   "artifactName = :artifactName, "
                   "artifactSize = :artifactSize, "
                   "artifactPath = :artifactPath, "
-                  "manualDownload = :manualDownlaod "
+                  "manualDownload = :manualDownload "
                   "WHERE buildNumber = :buildNumber "
                   "AND buildTargetId = :buildTargetId");
     query.bindValue(":status", build.status());
@@ -82,7 +84,7 @@ void BuildDao::updateBuild(const Build &build)
     query.bindValue(":artifactPath", build.artifactPath());
     query.bindValue(":manualDownload", build.manualDownload());
     query.bindValue(":buildNumber", build.id());
-    query.bindValue(":buildtargetId", build.buildTargetId().toString());
+    query.bindValue(":buildTargetId", build.buildTargetId().toString());
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
@@ -117,7 +119,7 @@ QVector<Build> BuildDao::builds(const QUuid &buildTargetId)
     }
     else
     {
-        query.prepare("SELECT * FROM Builds WHERE buildTargetId = :buildTargetId");
+        query.prepare("SELECT * FROM Builds WHERE buildTargetId = :buildTargetId ORDER BY buildNumber DESC");
         query.bindValue(":buildTargetId", buildTargetId.toString());
         query.exec();
     }
@@ -128,6 +130,7 @@ QVector<Build> BuildDao::builds(const QUuid &buildTargetId)
         build.setBuildTargetId(query.value("buildTargetId").toString());
         build.setStatus(query.value("status").toInt());
         build.setName(query.value("name").toString());
+        build.setCreateTime(query.value("createTime").toDateTime());
         build.setIconPath(query.value("iconPath").toString());
         build.setArtifactName(query.value("artifactName").toString());
         build.setArtifactSize(query.value("artifactSize").toULongLong());

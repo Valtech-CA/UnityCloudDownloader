@@ -17,5 +17,13 @@
         <file>ItemHighlight.qml</file>
         <file>BuildList.qml</file>
         <file>BuildDelegate.qml</file>
+        <file>canceled.png</file>
+        <file>failure.png</file>
+        <file>queued.png</file>
+        <file>restarted.png</file>
+        <file>success.png</file>
+        <file>unknown.png</file>
+        <file>started.png</file>
+        <file>download.png</file>
     </qresource>
 </RCC>
