@@ -32,6 +32,7 @@ void BuildTargetsModel::setDatabase(Database *database)
     if (m_db != nullptr && !m_projectId.isNull())
     {
         m_buildTargets = BuildTargetDao(m_db->sqlDatabase()).buildTargets(m_projectId);
+        fetchMore(QModelIndex());
     }
     else
     {
@@ -52,6 +53,7 @@ void BuildTargetsModel::setProjectId(const QUuid &projectId)
     if (m_db != nullptr && !m_projectId.isNull())
     {
         m_buildTargets = BuildTargetDao(m_db->sqlDatabase()).buildTargets(m_projectId);
+        fetchMore(QModelIndex());
     }
     else
     {
