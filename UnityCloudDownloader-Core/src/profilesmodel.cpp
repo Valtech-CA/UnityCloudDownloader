@@ -3,6 +3,7 @@
 #include "profile.h"
 #include "profiledao.h"
 #include "database.h"
+#include "servicelocator.h"
 
 #include <QSqlDatabase>
 
@@ -11,37 +12,12 @@ namespace ucd
 
 ProfilesModel::ProfilesModel(QObject *parent)
     : QAbstractListModel(parent)
-    , m_db(nullptr)
-{}
-
-ProfilesModel::ProfilesModel(Database *data, QObject *parent)
-    : QAbstractListModel(parent)
-    , m_db(data)
 {
-    m_profiles = ProfileDao(m_db->sqlDatabase()).profiles();
+    m_profiles = ProfileDao(ServiceLocator::database()).profiles();
 }
 
 ProfilesModel::~ProfilesModel()
 {}
-
-void ProfilesModel::setDatabase(Database *database)
-{
-    if (database == m_db)
-        return;
-
-    beginResetModel();
-    m_db = database;
-    if (m_db != nullptr)
-    {
-        m_profiles = ProfileDao(m_db->sqlDatabase()).profiles();
-    }
-    else
-    {
-        m_profiles.clear();
-    }
-    endResetModel();
-    emit databaseChanged(database);
-}
 
 QModelIndex ProfilesModel::createProfile(const QString &name, const QString &apiKey, const QString &rootPath)
 {
@@ -55,7 +31,7 @@ QModelIndex ProfilesModel::createProfile(const QString &name, const QString &api
 QModelIndex ProfilesModel::addProfile(const Profile &profile)
 {
     beginInsertRows(QModelIndex(), m_profiles.count(), m_profiles.count());
-    ProfileDao(m_db->sqlDatabase()).addProfile(profile);
+    ProfileDao(ServiceLocator::database()).addProfile(profile);
     m_profiles.append(profile);
     endInsertRows();
     return index(m_profiles.count() - 1);
@@ -121,7 +97,7 @@ bool ProfilesModel::setData(const QModelIndex &index, const QVariant &value, int
         return false;
     }
 
-    ProfileDao(m_db->sqlDatabase()).updateProfile(profile);
+    ProfileDao(ServiceLocator::database()).updateProfile(profile);
     return true;
 }
 
@@ -133,7 +109,7 @@ bool ProfilesModel::removeRows(int row, int count, const QModelIndex &parent)
 
     beginRemoveRows(QModelIndex(), row, row + count - 1);
 
-    ProfileDao dao(m_db->sqlDatabase());
+    ProfileDao dao(ServiceLocator::database());
     for (int i = row, end = row + count; i < end; ++i)
     {
         dao.removeProfile(m_profiles.at(i).uuid());

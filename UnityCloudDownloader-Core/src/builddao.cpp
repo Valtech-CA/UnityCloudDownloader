@@ -133,7 +133,7 @@ QVector<Build> BuildDao::builds(const QUuid &buildTargetId)
         build.setCreateTime(query.value("createTime").toDateTime());
         build.setIconPath(query.value("iconPath").toString());
         build.setArtifactName(query.value("artifactName").toString());
-        build.setArtifactSize(query.value("artifactSize").toULongLong());
+        build.setArtifactSize(query.value("artifactSize").toLongLong());
         build.setArtifactPath(query.value("artifactPath").toString());
         build.setManualDownload(query.value("manualDownload").toBool());
         builds.append(std::move(build));

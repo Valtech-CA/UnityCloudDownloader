@@ -5,6 +5,9 @@
 #include "buildtarget.h"
 #include "build.h"
 #include "unityapiclient.h"
+#include "servicelocator.h"
+#include "database.h"
+#include "synchronizer.h"
 
 #include <QObject>
 #include <QtConcurrent>
@@ -21,8 +24,20 @@ void Core::init()
     qRegisterMetaType<BuildTarget>("ucd_BuildTarget");
     qRegisterMetaTypeStreamOperators<BuildTarget>("ucd_BuildTarget");
     qRegisterMetaType<Build>("ucd_Build");
-    //qRegisterMetaTypeStreamOperators<Build>("ucd_Build");
+    qRegisterMetaTypeStreamOperators<Build>("ucd_Build");
     QtConcurrent::run(&UnityApiClient::preconnect);
+}
+
+void Core::init(const QString &storagePath, QObject *parent)
+{
+    init();
+
+    auto *database = new Database(storagePath, parent);
+    database->init();
+    ServiceLocator::setDatabaseProvier(database);
+
+    auto *synchronizer = new Synchronizer(parent);
+    ServiceLocator::setSynchronizer(synchronizer);
 }
 
 }

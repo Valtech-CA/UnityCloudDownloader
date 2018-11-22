@@ -15,7 +15,6 @@ Page {
         id: buildListView
         anchors.fill: parent
         model: BuildsModel {
-            database: ucdDb
             buildTargetId: buildList.buildTargetId
         }
 

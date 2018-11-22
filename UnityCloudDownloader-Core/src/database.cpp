@@ -9,6 +9,7 @@
 #include <QSqlQuery>
 #include <QUuid>
 #include <QVariant>
+#include <QDir>
 
 namespace ucd
 {
@@ -19,10 +20,11 @@ public:
     QString connectionName;
 };
 
-Database::Database(const QString &filePath, QObject *parent)
+Database::Database(const QString &storagePath, QObject *parent)
     : QObject(parent)
     , p(std::make_unique<DatabasePrivate>())
 {
+    auto filePath = QDir(storagePath).filePath("data.sqlite");
     p->connectionName = QUuid::createUuid().toString();
     auto database = QSqlDatabase::addDatabase("QSQLITE", p->connectionName);
     database.setDatabaseName(filePath);

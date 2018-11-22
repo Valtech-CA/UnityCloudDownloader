@@ -3,6 +3,8 @@
 
 #include "unityclouddownloader-core_global.h"
 
+class QObject;
+
 namespace ucd
 {
 
@@ -15,6 +17,7 @@ public:
     Core& operator=(const Core&) = delete;
 
     static void init();
+    static void init(const QString &storagePath, QObject *parent);
 };
 
 }

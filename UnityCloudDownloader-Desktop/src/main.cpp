@@ -1,7 +1,6 @@
 #include "systemtrayicon.h"
 
 #include "unityclouddownloadercore.h"
-#include "database.h"
 
 #include <QApplication>
 #include <QSystemTrayIcon>
@@ -17,8 +16,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Valtech");
     QCoreApplication::setOrganizationDomain("valtech.com");
     QCoreApplication::setApplicationName("UnityCloudDownloader");
-
-    ucd::Core::init();
 
     QApplication a(argc, argv);
     QApplication::setQuitOnLastWindowClosed(true);
@@ -38,12 +35,9 @@ int main(int argc, char *argv[])
     {
         configDir.mkpath(configPath);
     }
-    auto configFilePath = configDir.filePath("data.sqlite");
+    ucd::Core::init(configPath, &a);
 
-    ucd::Database database(configFilePath);
-    database.init();
-
-    SystemTrayIcon trayIcon(&database);
+    SystemTrayIcon trayIcon;
     trayIcon.show();
 
     QMetaObject::invokeMethod(&trayIcon, "onConfigure");

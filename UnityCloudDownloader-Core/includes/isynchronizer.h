@@ -13,13 +13,9 @@ class Build;
 class UCD_SHARED_EXPORT ISynchronizer
 {
 public:
-    ISynchronizer(const ISynchronizer&) = delete;
     virtual ~ISynchronizer() = default;
 
-    ISynchronizer& operator=(const ISynchronizer&) = delete;
-
     virtual void manualDownload(const Build &build) = 0;
-
 };
 
 }

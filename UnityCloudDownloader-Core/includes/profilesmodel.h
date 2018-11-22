@@ -12,12 +12,10 @@ namespace ucd
 {
 
 class Profile;
-class Database;
 
 class UCD_SHARED_EXPORT ProfilesModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(ucd::Database* database READ database WRITE setDatabase NOTIFY databaseChanged)
 public:
     enum Roles : int
     {
@@ -28,13 +26,9 @@ public:
     };
 
     explicit ProfilesModel(QObject *parent = nullptr);
-    explicit ProfilesModel(Database *data, QObject *parent = nullptr);
     virtual ~ProfilesModel() override;
 
-    Database* database() const { return m_db; }
-    void setDatabase(Database *database);
-
-    Q_INVOKABLE QModelIndex createProfile(const QString &name, const QString &apiKey, const QString &rootPath);
+    QModelIndex createProfile(const QString &name, const QString &apiKey, const QString &rootPath);
     QModelIndex addProfile(const Profile &profile);
 
     Q_INVOKABLE bool remove(int index, int count = 1);
@@ -46,13 +40,9 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-signals:
-    void databaseChanged(Database *);
-
 private:
     bool isIndexValid(const QModelIndex &index) const;
 
-    Database *m_db;
     QVector<Profile> m_profiles;
 };
 }

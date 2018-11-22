@@ -5,6 +5,7 @@
 #include "profiledao.h"
 #include "database.h"
 #include "unityapiclient.h"
+#include "servicelocator.h"
 
 #include <algorithm>
 
@@ -15,32 +16,10 @@ namespace ucd
 
 ProjectsModel::ProjectsModel(QObject *parent)
     : QAbstractListModel(parent)
-    , m_db(nullptr)
 {}
 
 ProjectsModel::~ProjectsModel()
 {}
-
-void ProjectsModel::setDatabase(Database *database)
-{
-    if (database == m_db)
-        return;
-
-    beginResetModel();
-    m_db = database;
-    if (m_db != nullptr && !m_profileId.isNull())
-    {
-        m_projects = ProjectDao(m_db->sqlDatabase()).projects(m_profileId);
-        fetchMore(QModelIndex());
-    }
-    else
-    {
-        m_projects.clear();
-    }
-
-    endResetModel();
-    emit databaseChanged(database);
-}
 
 void ProjectsModel::setProfileId(const QUuid &profileId)
 {
@@ -49,9 +28,9 @@ void ProjectsModel::setProfileId(const QUuid &profileId)
 
     beginResetModel();
     m_profileId = profileId;
-    if (m_db != nullptr && !m_profileId.isNull())
+    if (!m_profileId.isNull())
     {
-        m_projects = ProjectDao(m_db->sqlDatabase()).projects(m_profileId);
+        m_projects = ProjectDao(ServiceLocator::database()).projects(m_profileId);
         fetchMore(QModelIndex());
     }
     else
@@ -77,7 +56,7 @@ bool ProjectsModel::updateProject(int row, const Project &project)
     currentProject.setName(project.name());
     currentProject.setIconPath(project.iconPath());
 
-    ProjectDao(m_db->sqlDatabase()).updateProject(currentProject);
+    ProjectDao(ServiceLocator::database()).updateProject(currentProject);
     emit dataChanged(index(row), index(row));
     return true;
 }
@@ -87,7 +66,7 @@ void ProjectsModel::addProject(const Project &project)
     beginInsertRows(QModelIndex(), m_projects.size(), m_projects.size());
     Project newProject(project);
     newProject.setProfileId(m_profileId);
-    ProjectDao(m_db->sqlDatabase()).addProject(newProject);
+    ProjectDao(ServiceLocator::database()).addProject(newProject);
     m_projects.append(std::move(newProject));
     endInsertRows();
 }
@@ -150,7 +129,7 @@ bool ProjectsModel::setData(const QModelIndex &index, const QVariant &value, int
         return false;
     }
 
-    ProjectDao(m_db->sqlDatabase()).updateProject(project);
+    ProjectDao(ServiceLocator::database()).updateProject(project);
     return true;
 }
 
@@ -161,7 +140,7 @@ bool ProjectsModel::removeRows(int row, int count, const QModelIndex &parent)
 
     beginRemoveRows(parent, row, row + count - 1);
 
-    ProjectDao dao(m_db->sqlDatabase());
+    ProjectDao dao(ServiceLocator::database());
     for (int i = row, end = row + count; i < end; ++i)
     {
         dao.removeProject(m_projects.at(i).id());
@@ -196,7 +175,7 @@ void ProjectsModel::fetchMore(const QModelIndex &parent)
 {
     Q_UNUSED(parent);
 
-    auto apiKey = ProfileDao(m_db->sqlDatabase()).getApiKey(m_profileId);
+    auto apiKey = ProfileDao(ServiceLocator::database()).getApiKey(m_profileId);
     auto *unityClient = new UnityApiClient(apiKey, this);
 
     connect(unityClient, &UnityApiClient::projectsFetched, unityClient, &UnityApiClient::deleteLater);

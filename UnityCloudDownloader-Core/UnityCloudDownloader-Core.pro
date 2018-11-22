@@ -44,7 +44,10 @@ SOURCES += \
     src/build.cpp \
     src/buildsmodel.cpp \
     src/builddao.cpp \
-    src/isynchronizer.cpp
+    src/isynchronizer.cpp \
+    src/abstractsynchronizer.cpp \
+    src/servicelocator.cpp \
+    src/synchronizer.cpp
 
 HEADERS += \
     includes/unityclouddownloader-core_global.h \
@@ -53,7 +56,7 @@ HEADERS += \
     includes/buildtarget.h \
     includes/unityclouddownloadercore.h \
     src/profiledao.h \
-    includes/database.h \
+    src/database.h \
     src/projectdao.h \
     src/buildtargetdao.h \
     includes/unityapiclient.h \
@@ -63,7 +66,11 @@ HEADERS += \
     includes/build.h \
     includes/buildsmodel.h \
     src/builddao.h \
-    includes/isynchronizer.h
+    includes/isynchronizer.h \
+    includes/servicelocator.h \
+    src/synchronizer.h \
+    includes/abstractsynchronizer.h \
+    includes/idatabaseprovider.h
 
 unix {
     target.path = /usr/lib

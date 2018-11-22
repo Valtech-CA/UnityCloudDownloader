@@ -2,7 +2,7 @@
 
 #include "qmlcontext.h"
 
-#include "database.h"
+#include "servicelocator.h"
 #include "unityapiclient.h"
 #include "profilesmodel.h"
 #include "projectsmodel.h"
@@ -17,9 +17,8 @@
 #include <QQuickWindow>
 #include <QQmlContext>
 
-SystemTrayIcon::SystemTrayIcon(ucd::Database *data, QObject *parent)
+SystemTrayIcon::SystemTrayIcon(QObject *parent)
     : QSystemTrayIcon(parent)
-    , m_db(data)
     , m_menu(nullptr)
     , m_quitAction(nullptr)
     , m_qmlEngine(nullptr)
@@ -47,7 +46,6 @@ void SystemTrayIcon::onConfigure()
     {
         auto *qmlContext = new QmlContext(this);
         auto *unityApiClient = new ucd::UnityApiClient(this);
-        qmlRegisterType<ucd::Database>();
         qmlRegisterType<ucd::ProfilesModel>("ucd", 1, 0, "ProfilesModel");
         qmlRegisterType<ucd::ProjectsModel>("ucd", 1, 0, "ProjectsModel");
         qmlRegisterType<ucd::BuildTargetsModel>("ucd", 1, 0, "BuildTargetsModel");
@@ -55,7 +53,6 @@ void SystemTrayIcon::onConfigure()
         qmlRegisterUncreatableMetaObject(ucd::Build::staticMetaObject, "ucd", 1, 0, "Build", "Cannot create Build object");
         m_qmlEngine = new QQmlApplicationEngine(this);
         m_qmlEngine->rootContext()->setContextObject(qmlContext);
-        m_qmlEngine->rootContext()->setContextProperty("ucdDb", m_db);
         m_qmlEngine->rootContext()->setContextProperty("unityClient", unityApiClient);
         m_qmlEngine->load(QUrl("qrc:/views/main.qml"));
         m_window = qobject_cast<QQuickWindow*>(m_qmlEngine->rootObjects().first());

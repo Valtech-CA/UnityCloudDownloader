@@ -50,7 +50,7 @@ public:
     const QDateTime createTime() const { return m_createTime; }
     const QString& iconPath() const { return m_iconPath; }
     const QString& artifactName() const { return m_artifactName; }
-    uint64_t artifactSize() const { return m_artifactSize; }
+    qint64 artifactSize() const { return m_artifactSize; }
     const QString& artifactPath() const { return m_artifactPath; }
     bool manualDownload() const { return m_manual; }
 
@@ -61,7 +61,7 @@ public:
     void setCreateTime(const QDateTime &createTime);
     void setIconPath(QString iconPath);
     void setArtifactName(QString artifactName);
-    void setArtifactSize(uint64_t size);
+    void setArtifactSize(qint64 size);
     void setArtifactPath(QString artifactPath);
     void setManualDownload(bool value);
 
@@ -73,11 +73,14 @@ private:
     QDateTime m_createTime;
     QString m_iconPath;
     QString m_artifactName;
-    uint64_t m_artifactSize;
+    qint64 m_artifactSize;
     QString m_artifactPath;
     bool m_manual;
 };
 
 }
+
+QDataStream &operator<<(QDataStream &out, const ucd::Build &value);
+QDataStream &operator>>(QDataStream &in, ucd::Build &dest);
 
 #endif // UCD_BUILD_H

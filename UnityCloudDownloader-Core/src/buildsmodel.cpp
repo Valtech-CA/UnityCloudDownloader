@@ -9,6 +9,7 @@
 #include "profiledao.h"
 #include "database.h"
 #include "unityapiclient.h"
+#include "servicelocator.h"
 
 #include <algorithm>
 
@@ -19,32 +20,10 @@ namespace ucd
 
 BuildsModel::BuildsModel(QObject *parent)
     : QAbstractListModel(parent)
-    , m_db(nullptr)
 {}
 
 BuildsModel::~BuildsModel()
 {}
-
-void BuildsModel::setDatabase(Database *database)
-{
-    if (database == m_db)
-        return;
-
-    beginResetModel();
-    m_db = database;
-    if (m_db != nullptr && !m_buildTargetId.isNull())
-    {
-        m_builds = BuildDao(m_db->sqlDatabase()).builds(m_buildTargetId);
-        fetchMore(QModelIndex());
-    }
-    else
-    {
-        m_builds.clear();
-    }
-
-    endResetModel();
-    emit databaseChanged(database);
-}
 
 void BuildsModel::setBuildTargetId(const QUuid &buildTargetId)
 {
@@ -53,9 +32,9 @@ void BuildsModel::setBuildTargetId(const QUuid &buildTargetId)
 
     beginResetModel();
     m_buildTargetId = buildTargetId;
-    if (m_db != nullptr && !m_buildTargetId.isNull())
+    if (!m_buildTargetId.isNull())
     {
-        m_builds = BuildDao(m_db->sqlDatabase()).builds(m_buildTargetId);
+        m_builds = BuildDao(ServiceLocator::database()).builds(m_buildTargetId);
         fetchMore(QModelIndex());
     }
     else
@@ -79,7 +58,7 @@ bool BuildsModel::updateBuild(int row, const Build &build)
 
     currentBuild.takeFrom(build);
 
-    BuildDao(m_db->sqlDatabase()).updateBuild(currentBuild);
+    BuildDao(ServiceLocator::database()).updateBuild(currentBuild);
     emit dataChanged(index(row), index(row));
     return true;
 }
@@ -99,7 +78,7 @@ void BuildsModel::addBuild(const Build &build)
     beginInsertRows(QModelIndex(), index, index);
     Build newBuild(build);
     newBuild.setBuildTargetId(m_buildTargetId);
-    BuildDao(m_db->sqlDatabase()).addBuild(newBuild);
+    BuildDao(ServiceLocator::database()).addBuild(newBuild);
     m_builds.insert(index, std::move(newBuild));
     endInsertRows();
 }
@@ -170,7 +149,7 @@ bool BuildsModel::setData(const QModelIndex &index, const QVariant &value, int r
         return false;
     }
 
-    BuildDao(m_db->sqlDatabase()).updateBuild(build);
+    BuildDao(ServiceLocator::database()).updateBuild(build);
     return true;
 }
 
@@ -181,7 +160,7 @@ bool BuildsModel::removeRows(int row, int count, const QModelIndex &parent)
 
     beginRemoveRows(parent, row, row + count - 1);
 
-    BuildDao dao(m_db->sqlDatabase());
+    BuildDao dao(ServiceLocator::database());
     for (int i = row, end = row + count; i < end; ++i)
     {
         dao.removeBuild(m_builds.at(i));
@@ -217,9 +196,9 @@ void BuildsModel::fetchMore(const QModelIndex &parent)
 {
     Q_UNUSED(parent);
 
-    auto buildTarget = BuildTargetDao(m_db->sqlDatabase()).buildTarget(m_buildTargetId);
-    auto project = ProjectDao(m_db->sqlDatabase()).project(buildTarget.projectId());
-    auto apiKey = ProfileDao(m_db->sqlDatabase()).getApiKey(project.profileId());
+    auto buildTarget = BuildTargetDao(ServiceLocator::database()).buildTarget(m_buildTargetId);
+    auto project = ProjectDao(ServiceLocator::database()).project(buildTarget.projectId());
+    auto apiKey = ProfileDao(ServiceLocator::database()).getApiKey(project.profileId());
     auto *unityClient = new UnityApiClient(apiKey, this);
 
     connect(unityClient, &UnityApiClient::buildsFetched, unityClient, &UnityApiClient::deleteLater);

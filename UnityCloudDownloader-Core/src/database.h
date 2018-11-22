@@ -4,6 +4,7 @@
 #pragma once
 
 #include "unityclouddownloader-core_global.h"
+#include "idatabaseprovider.h"
 
 #include <QObject>
 
@@ -14,19 +15,19 @@ namespace ucd
 
 class DatabasePrivate;
 
-class UCD_SHARED_EXPORT Database : public QObject
+class Database : public QObject, public IDatabaseProvider
 {
     Q_OBJECT
 
 public:
-    explicit Database(const QString &filePath, QObject *parent = nullptr);
-    ~Database();
+    explicit Database(const QString &storagePath, QObject *parent = nullptr);
+    ~Database() override;
 
     void init();
 
-    bool hasProfiles() const;
+    bool hasProfiles() const override;
 
-    QSqlDatabase sqlDatabase();
+    QSqlDatabase sqlDatabase() override;
 
 private:
     std::unique_ptr<DatabasePrivate> p;

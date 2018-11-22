@@ -15,7 +15,6 @@ Page {
         id: projectListView
         anchors.fill: parent
         model: ProjectsModel {
-            database: ucdDb
             profileId: projectList.profileId
         }
 

@@ -13,12 +13,10 @@ namespace ucd
 {
 
 class BuildTarget;
-class Database;
 
 class UCD_SHARED_EXPORT BuildTargetsModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(ucd::Database* database READ database WRITE setDatabase NOTIFY databaseChanged)
     Q_PROPERTY(QUuid projectId READ projectId WRITE setProjectId NOTIFY projectIdChanged)
 public:
     enum Roles : int
@@ -37,9 +35,6 @@ public:
     BuildTargetsModel(QObject *parent = nullptr);
     virtual ~BuildTargetsModel() override;
 
-    Database* database() const { return m_db; }
-    void setDatabase(Database *database);
-
     QUuid projectId() const { return m_projectId; }
     void setProjectId(const QUuid &projectId);
 
@@ -55,7 +50,6 @@ public:
     void fetchMore(const QModelIndex &parent) override;
 
 signals:
-    void databaseChanged(Database *database);
     void projectIdChanged(QUuid projectId);
 
 private slots:
@@ -64,7 +58,6 @@ private slots:
 private:
     bool isIndexValid(const QModelIndex &index) const;
 
-    Database *m_db;
     QUuid m_projectId;
     QVector<BuildTarget> m_buildTargets;
 };

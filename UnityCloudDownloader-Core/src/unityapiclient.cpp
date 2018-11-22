@@ -187,7 +187,7 @@ void UnityApiClient::buildsReceived()
                     {
                         QJsonValue file = files[0];
                         build.setArtifactName(file["filename"].toString());
-                        build.setArtifactSize(file["size"].toVariant().toULongLong());
+                        build.setArtifactSize(file["size"].toVariant().toLongLong());
                         build.setArtifactPath(file["href"].toString());
                         break;
                     }

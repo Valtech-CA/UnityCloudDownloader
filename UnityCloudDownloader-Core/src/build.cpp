@@ -1,5 +1,7 @@
 #include "build.h"
 
+#include <QDataStream>
+
 namespace ucd
 {
 
@@ -89,7 +91,7 @@ void Build::setArtifactName(QString artifactName)
     m_artifactName = std::move(artifactName);
 }
 
-void Build::setArtifactSize(uint64_t size)
+void Build::setArtifactSize(qint64 size)
 {
     m_artifactSize = size;
 }
@@ -105,3 +107,49 @@ void Build::setManualDownload(bool value)
 }
 
 } // namespace ucd
+
+QDataStream &operator<<(QDataStream &out, const ucd::Build &value)
+{
+    out
+            << value.id()
+            << value.name()
+            << value.buildTargetId()
+            << static_cast<int>(value.status())
+            << value.iconPath()
+            << value.artifactName()
+            << value.artifactSize()
+            << value.artifactPath();
+
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, ucd::Build &dest)
+{
+    int buildNumber;
+    in >> buildNumber;
+    QString name;
+    in >> name;
+    QUuid buildTargetId;
+    in >> buildTargetId;
+    int status;
+    in >> status;
+    QString iconPath;
+    in >> iconPath;
+    QString artifactName;
+    in >> artifactName;
+    qint64 artifactSize;
+    in >> artifactSize;
+    QString artifactPath;
+    in >> artifactPath;
+
+    dest.setId(buildNumber);
+    dest.setName(name);
+    dest.setBuildTargetId(buildTargetId);
+    dest.setStatus(status);
+    dest.setIconPath(iconPath);
+    dest.setArtifactName(artifactName);
+    dest.setArtifactSize(artifactSize);
+    dest.setArtifactPath(artifactPath);
+
+    return in;
+}

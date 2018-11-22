@@ -51,7 +51,6 @@ Page {
         anchors.fill: parent
         model: ProfilesModel {
             id: profilesModel
-            database: ucdDb
         }
 
         delegate: ProfileDelegate {
