@@ -47,7 +47,9 @@ SOURCES += \
     src/isynchronizer.cpp \
     src/abstractsynchronizer.cpp \
     src/servicelocator.cpp \
-    src/synchronizer.cpp
+    src/synchronizer.cpp \
+    src/buildref.cpp \
+    src/downloadworker.cpp
 
 HEADERS += \
     includes/unityclouddownloader-core_global.h \
@@ -70,7 +72,9 @@ HEADERS += \
     includes/servicelocator.h \
     src/synchronizer.h \
     includes/abstractsynchronizer.h \
-    includes/idatabaseprovider.h
+    includes/idatabaseprovider.h \
+    includes/buildref.h \
+    src/downloadworker.h
 
 unix {
     target.path = /usr/lib

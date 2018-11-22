@@ -142,6 +142,36 @@ QVector<Build> BuildDao::builds(const QUuid &buildTargetId)
     return builds;
 }
 
+Build BuildDao::build(const QUuid &buildTargetId, int buildNumber)
+{
+    Build build;
+    QSqlQuery query(m_db);
+    query.prepare("SELECT * FROM Builds WHERE buildTargetId = :buildTargetId AND buildNumber = :buildNumber");
+    query.bindValue(":buildTargetId", buildTargetId.toString());
+    query.bindValue(":buildNumber", buildNumber);
+    if (!query.exec())
+    {
+        auto error = query.lastError().text().toUtf8();
+        qCritical(error);
+        throw std::runtime_error(error);
+    }
+    else if (query.next())
+    {
+        build.setId(query.value("buildNumber").toInt());
+        build.setBuildTargetId(query.value("buildTargetId").toString());
+        build.setStatus(query.value("status").toInt());
+        build.setName(query.value("name").toString());
+        build.setCreateTime(query.value("createTime").toDateTime());
+        build.setIconPath(query.value("iconPath").toString());
+        build.setArtifactName(query.value("artifactName").toString());
+        build.setArtifactSize(query.value("artifactSize").toLongLong());
+        build.setArtifactPath(query.value("artifactPath").toString());
+        build.setManualDownload(query.value("manualDownload").toBool());
+    }
+
+    return build;
+}
+
 void BuildDao::removeBuilds(const QUuid &buildTargetId)
 {
     QSqlQuery query(m_db);

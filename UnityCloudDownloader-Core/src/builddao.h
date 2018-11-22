@@ -23,6 +23,7 @@ public:
     void updateBuild(const Build &build);
     void removeBuild(const Build &build);
     QVector<Build> builds(const QUuid &buildTargetId);
+    Build build(const QUuid &buildTargetId, int buildNumber);
 
     void removeBuilds(const QUuid &buildTargetId);
 

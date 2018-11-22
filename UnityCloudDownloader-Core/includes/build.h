@@ -5,6 +5,9 @@
 
 #include "unityclouddownloader-core_global.h"
 
+// including buildref for convenience
+#include "buildref.h"
+
 #include <QMetaType>
 #include <QString>
 #include <QUuid>
