@@ -25,5 +25,8 @@
         <file>unknown.png</file>
         <file>started.png</file>
         <file>download.png</file>
+        <file>arrow-sync.png</file>
+        <file>cloud-sync.png</file>
+        <file>sarrow-sync.png</file>
     </qresource>
 </RCC>

@@ -20,7 +20,7 @@ namespace ucd
 
 enum
 {
-    BufferReserve = 5000
+    BufferReserve = 15000,
 };
 
 DownloadWorker::DownloadWorker(QObject *parent)
@@ -28,9 +28,12 @@ DownloadWorker::DownloadWorker(QObject *parent)
     , m_connectionId(QUuid::createUuid())
     , m_busy(false)
     , m_network(new QNetworkAccessManager(this))
+    , m_reply(nullptr)
+    , m_lastSize(0)
 {
     m_buffer.reserve(BufferReserve);
-    connect(this, &DownloadWorker::downloadRequested, this, &DownloadWorker::onDownloadRequested);
+    connect(this, &DownloadWorker::downloadRequested, this, &DownloadWorker::onDownloadRequested, Qt::QueuedConnection);
+    connect(this, &DownloadWorker::progressRequested, this, &DownloadWorker::onProgressRequested, Qt::QueuedConnection);
 }
 
 DownloadWorker::~DownloadWorker()
@@ -40,6 +43,12 @@ void DownloadWorker::download(const Build &build)
 {
     m_busy = true;
     emit downloadRequested(build);
+}
+
+void DownloadWorker::requestProgress()
+{
+    if (m_busy)
+        emit progressRequested();
 }
 
 void DownloadWorker::onDownloadRequested(Build build)
@@ -78,17 +87,18 @@ void DownloadWorker::onDownloadRequested(Build build)
 
     // start download
     QNetworkRequest request(build.artifactPath());
-    auto *reply = m_network->get(request);
-    connect(reply, &QNetworkReply::readyRead, this, &DownloadWorker::onReadyRead);
-    connect(reply, &QNetworkReply::finished, this, &DownloadWorker::onDownloadFinished);
-    connect(reply, &QNetworkReply::finished, reply, &QNetworkReply::deleteLater);
+    m_reply = m_network->get(request);
+    connect(m_reply, &QNetworkReply::readyRead, this, &DownloadWorker::onReadyRead);
+    connect(m_reply, &QNetworkReply::finished, this, &DownloadWorker::onDownloadFinished);
+    connect(m_reply, &QNetworkReply::finished, m_reply, &QNetworkReply::deleteLater);
+    m_progressTimer.start();
+    m_lastSize = 0;
 }
 
 void DownloadWorker::onReadyRead()
 {
-    auto *reply = qobject_cast<QNetworkReply*>(sender());
     qint64 bytesRead = 0;
-    while ((bytesRead = reply->read(m_buffer.data(), m_buffer.capacity())) > 0)
+    while ((bytesRead = m_reply->read(m_buffer.data(), m_buffer.capacity())) > 0)
     {
         m_outFile->write(m_buffer.data(), bytesRead);
     }
@@ -96,21 +106,40 @@ void DownloadWorker::onReadyRead()
 
 void DownloadWorker::onDownloadFinished()
 {
+    emit downloadUpdated(m_build, 1, 0);
+    m_progressTimer.invalidate();
     QSqlDatabase::removeDatabase(m_connectionId.toString());
     m_outFile->close();
     m_outFile = nullptr;
 
-    auto *reply = qobject_cast<QNetworkReply*>(sender());
-    if (reply->error())
+    if (m_reply->error())
     {
-        qCritical("Download failed %s", reply->errorString().toUtf8().data());
+        qCritical("Download failed %s", m_reply->errorString().toUtf8().data());
+        m_reply = nullptr;
+        m_busy = false;
         emit downloadFailed(m_build);
     }
     else
     {
+        m_reply = nullptr;
         m_busy = false;
         emit downloadCompleted(m_build);
     }
+}
+
+void DownloadWorker::onProgressRequested()
+{
+    if (m_reply == nullptr)
+        return;
+
+    qint64 currentSize = m_outFile->size();
+    float ratio = float(currentSize) / m_build.artifactSize();
+    // calculate the speed in bytes per second
+    auto elapsedTime = m_progressTimer.restart();
+    qint64 speed = (elapsedTime != 0) ? (((currentSize - m_lastSize) * 1000) / elapsedTime) : 0;
+    m_lastSize = currentSize;
+
+    emit downloadUpdated(m_build, ratio, speed);
 }
 
 }

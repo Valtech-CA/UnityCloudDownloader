@@ -27,6 +27,7 @@ public:
         Name,
         OrganisationId,
         IconPath,
+        HasSynchedBuildTargets,
     };
 
     ProjectsModel(QObject *parent = nullptr);
@@ -49,6 +50,9 @@ public:
 signals:
     void profileIdChanged(QUuid profileId);
 
+protected:
+    void timerEvent(QTimerEvent *event) override;
+
 private slots:
     void onProjectsFetched(const QVector<Project> &projects);
 
@@ -57,6 +61,7 @@ private:
 
     QUuid m_profileId;
     QVector<Project> m_projects;
+    int m_updateTimer;
 };
 
 }

@@ -4,6 +4,9 @@
 #include "builddao.h"
 #include "servicelocator.h"
 
+#include <QDataStream>
+#include <QDebug>
+
 namespace ucd
 {
 
@@ -42,3 +45,24 @@ BuildRef::operator Build() const
 }
 
 } // namespace ucd
+
+QDataStream &operator<<(QDataStream &out, const ucd::BuildRef &value)
+{
+    out
+            << value.m_buildNumber
+            << value.m_buildTargetId;
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, ucd::BuildRef &dest)
+{
+    in >> dest.m_buildNumber;
+    in >> dest.m_buildTargetId;
+    return in;
+}
+
+QDebug &operator<<(QDebug &out, const ucd::BuildRef &value)
+{
+    out << "{ " << value.m_buildNumber << ", " << value.m_buildTargetId << " }";
+    return out;
+}

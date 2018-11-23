@@ -8,6 +8,17 @@
 #include <QObject>
 #include <QUuid>
 
+class QDebug;
+
+namespace ucd
+{
+class BuildRef;
+}
+
+QDebug &operator<<(QDebug &out, const ucd::BuildRef &value);
+QDataStream &operator<<(QDataStream &out, const ucd::BuildRef &value);
+QDataStream &operator>>(QDataStream &in, ucd::BuildRef &dest);
+
 namespace ucd
 {
 
@@ -16,6 +27,10 @@ class Build;
 class UCD_SHARED_EXPORT BuildRef
 {
     Q_GADGET
+    friend QDebug &::operator<<(QDebug &out, const ucd::BuildRef &value);
+    friend QDataStream &::operator<<(QDataStream &out, const ucd::BuildRef &value);
+    friend QDataStream &::operator>>(QDataStream &in, ucd::BuildRef &dest);
+
 public:
     BuildRef();
     BuildRef(const Build &build);

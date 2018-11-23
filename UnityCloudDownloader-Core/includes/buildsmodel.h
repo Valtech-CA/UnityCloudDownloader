@@ -32,6 +32,11 @@ public:
         ArtifactPath,
         ManualDownload,
         BuildRef,
+        IsQueued,
+        IsDownloading,
+        IsDownloaded,
+        DownloadProgress,
+        DownloadSpeed,
     };
 
     BuildsModel(QObject *parent = nullptr);
@@ -56,6 +61,8 @@ signals:
 
 private slots:
     void onBuildsFetched(const QVector<Build> &builds);
+    void updateDownloadStatus(const Build &build);
+    void updateDownloadProgress(const Build &build);
 
 private:
     bool isIndexValid(const QModelIndex &index) const;

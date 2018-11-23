@@ -2,6 +2,7 @@
 
 #include "project.h"
 #include "projectdao.h"
+#include "buildtargetdao.h"
 #include "profiledao.h"
 #include "database.h"
 #include "unityapiclient.h"
@@ -10,16 +11,22 @@
 #include <algorithm>
 
 #include <QSqlDatabase>
+#include <QTimerEvent>
 
 namespace ucd
 {
 
 ProjectsModel::ProjectsModel(QObject *parent)
     : QAbstractListModel(parent)
-{}
+    , m_updateTimer(0)
+{
+    m_updateTimer = startTimer(2000);
+}
 
 ProjectsModel::~ProjectsModel()
-{}
+{
+    killTimer(m_updateTimer);
+}
 
 void ProjectsModel::setProfileId(const QUuid &profileId)
 {
@@ -100,6 +107,8 @@ QVariant ProjectsModel::data(const QModelIndex &index, int role) const
         return project.organisationId();
     case Roles::IconPath:
         return project.iconPath();
+    case Roles::HasSynchedBuildTargets:
+        return BuildTargetDao(ServiceLocator::database()).hasSynchedBuildTargets(project.id());
     default:
         break;
     }
@@ -161,6 +170,7 @@ QHash<int, QByteArray> ProjectsModel::roleNames() const
     roles[Roles::CloudId] = "cloudId";
     roles[Roles::OrganisationId] = "orgId";
     roles[Roles::IconPath] = "iconPath";
+    roles[Roles::HasSynchedBuildTargets] = "hasSynchedBuildTargets";
     return roles;
 }
 
@@ -181,6 +191,14 @@ void ProjectsModel::fetchMore(const QModelIndex &parent)
     connect(unityClient, &UnityApiClient::projectsFetched, unityClient, &UnityApiClient::deleteLater);
     connect(unityClient, &UnityApiClient::projectsFetched, this, &ProjectsModel::onProjectsFetched);
     unityClient->fetchProjects();
+}
+
+void ProjectsModel::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == m_updateTimer && !m_projects.isEmpty())
+    {
+        emit dataChanged(index(0), index(m_projects.size() - 1), QVector<int>{ Roles::HasSynchedBuildTargets });
+    }
 }
 
 void ProjectsModel::onProjectsFetched(const QVector<Project> &projects)

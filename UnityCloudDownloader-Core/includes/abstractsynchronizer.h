@@ -5,6 +5,7 @@
 
 #include "unityclouddownloader-core_global.h"
 #include "isynchronizer.h"
+#include "build.h"
 
 #include <QObject>
 
@@ -22,6 +23,13 @@ public:
     virtual ~AbstractSynchronizer() override = default;
 
     AbstractSynchronizer& operator=(const AbstractSynchronizer&) = delete;
+
+signals:
+    void downloadQueued(ucd::Build build);
+    void downloadStarted(ucd::Build build);
+    void downloadUpdated(ucd::Build build);
+    void downloadCompleted(ucd::Build build);
+    void downloadFailed(ucd::Build build);
 };
 
 }

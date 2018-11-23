@@ -164,6 +164,25 @@ BuildTarget BuildTargetDao::buildTarget(const QUuid &buildTargetId, bool include
     return buildTarget;
 }
 
+bool BuildTargetDao::hasSynchedBuildTargets(const QUuid &projectId)
+{
+    QSqlQuery query(m_db);
+    query.prepare("SELECT COUNT(*) WHERE EXISTS(SELECT 1 FROM BuildTargets WHERE projectId = :projectId AND sync = 1)");
+    query.bindValue(":projectId", projectId.toString());
+    if (!query.exec())
+    {
+        auto error = query.lastError().text().toUtf8();
+        qCritical("%s", error.data());
+        throw std::runtime_error(error);
+    }
+    else if (query.next())
+    {
+        return query.value(0).toInt() != 0;
+    }
+
+    return false;
+}
+
 void BuildTargetDao::removeBuildTargets(const QUuid &projectId)
 {
     QSqlQuery query(m_db);

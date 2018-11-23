@@ -40,12 +40,32 @@ ItemDelegate {
     }
 
     Text {
+        id: nameText
         text: name
         anchors.left: icon.right
         anchors.leftMargin: 20
         anchors.verticalCenter: parent.verticalCenter
         color: Material.foreground
         font.pointSize: 32
+    }
+
+    Image {
+        source: "sarrow-sync.png"
+        anchors.left: nameText.right
+        anchors.leftMargin: 10
+        anchors.verticalCenter: parent.verticalCenter
+        width: 40
+        height: 40
+        visible: hasSynchedBuildTargets
+
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+
+            ToolTip.text: qsTr("one or more build targets are set to synchronize")
+            ToolTip.visible: containsMouse
+            ToolTip.delay: 1000
+        }
     }
 
     ArrowButton {
@@ -56,7 +76,9 @@ ItemDelegate {
         anchors.verticalCenter: parent.verticalCenter
 
         onClicked: {
-            mainStack.push("./BuildTargetList.qml", {"projectId": id})
+            mainStack.push("BuildTargetList.qml", {
+                               "projectId": id
+                           })
         }
     }
 }

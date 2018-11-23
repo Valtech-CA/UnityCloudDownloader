@@ -15,6 +15,11 @@ class UCD_SHARED_EXPORT ISynchronizer
 public:
     virtual ~ISynchronizer() = default;
 
+    virtual bool isQueued(const Build &build) const = 0;
+    virtual bool isDownloaded(const Build &build) const = 0;
+    virtual bool isDownloading(const Build &build) const = 0;
+    virtual float downloadProgress(const Build &build) const = 0;
+    virtual qint64 downloadSpeed(const Build &build) const = 0;
     virtual void manualDownload(const Build &build) = 0;
 };
 

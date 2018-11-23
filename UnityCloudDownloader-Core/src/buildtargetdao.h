@@ -25,6 +25,8 @@ public:
     QVector<BuildTarget> buildTargets(const QUuid &projectId, bool includeBuilds = false);
     BuildTarget buildTarget(const QUuid &buildTargetId, bool includeBuilds = false);
 
+    bool hasSynchedBuildTargets(const QUuid &projectId);
+
     void removeBuildTargets(const QUuid &projectId);
 
 private:

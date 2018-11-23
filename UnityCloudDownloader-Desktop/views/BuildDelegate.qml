@@ -22,6 +22,27 @@ ItemDelegate {
         color: Material.color(Material.Grey)
     }
 
+    ProgressBar {
+        id: downloadProgressBar
+        value: downloadProgress
+        indeterminate: isQueued
+        width: parent.width - 60
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 8
+        anchors.horizontalCenter: parent.horizontalCenter
+        visible: isQueued || isDownloading
+    }
+
+    Label {
+        id: downloadSpeedText
+        font.pointSize: 11
+        anchors.right: downloadProgressBar.right
+        anchors.bottom: downloadProgressBar.top
+        anchors.bottomMargin: 2
+        text: formattedDataSize(downloadSpeed) + "/s"
+        visible: isDownloading
+    }
+
     Image {
         id: icon
         width: 60
@@ -105,28 +126,28 @@ ItemDelegate {
         function imageForStatus(status) {
             if (status === Build.Queued) {
                 tooltipText = qsTr("queued");
-                return "./queued.png"
+                return "queued.png"
             } else if (status === Build.SentToBuilder) {
                 tooltipText = qsTr("sent to builder")
-                return "./queued.png"
+                return "queued.png"
             } else if (status === Build.Started) {
                 tooltipText = qsTr("build in progress")
-                return "./started.png"
+                return "started.png"
             } else if (status === Build.Restarted) {
                 tooltipText = qsTr("restarted")
-                return "./restarted.png"
+                return "restarted.png"
             } else if (status === Build.Success) {
                 tooltipText = qsTr("build successful")
-                return "./success.png"
+                return "success.png"
             } else if (status === Build.Failure) {
                 tooltipText = qsTr("failed")
-                return "./failure.png"
+                return "failure.png"
             } else if (status === Build.Canceled) {
                 tooltipText = qsTr("canceled")
-                return "./canceled.png"
+                return "canceled.png"
             } else {
                 tooltipText = qsTr("unknown")
-                return "./unknown.png"
+                return "unknown.png"
             }
         }
     }
@@ -138,7 +159,7 @@ ItemDelegate {
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: statusIcon.left
         anchors.rightMargin: 4
-        visible: !!artifactPath
+        visible: !!artifactPath && !isQueued && !isDownloading && !isDownloaded
 
         onClicked: downloadManually(buildRef)
 

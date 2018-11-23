@@ -10,6 +10,7 @@
 #include "database.h"
 #include "unityapiclient.h"
 #include "servicelocator.h"
+#include "abstractsynchronizer.h"
 
 #include <algorithm>
 
@@ -20,7 +21,14 @@ namespace ucd
 
 BuildsModel::BuildsModel(QObject *parent)
     : QAbstractListModel(parent)
-{}
+{
+    auto *synchronizer = ServiceLocator::synchronizer();
+    connect(synchronizer, &AbstractSynchronizer::downloadQueued, this, &BuildsModel::updateDownloadStatus);
+    connect(synchronizer, &AbstractSynchronizer::downloadStarted, this, &BuildsModel::updateDownloadStatus);
+    connect(synchronizer, &AbstractSynchronizer::downloadUpdated, this, &BuildsModel::updateDownloadProgress);
+    connect(synchronizer, &AbstractSynchronizer::downloadCompleted, this, &BuildsModel::updateDownloadStatus);
+    connect(synchronizer, &AbstractSynchronizer::downloadFailed, this, &BuildsModel::updateDownloadStatus);
+}
 
 BuildsModel::~BuildsModel()
 {}
@@ -66,14 +74,12 @@ bool BuildsModel::updateBuild(int row, const Build &build)
 void BuildsModel::addBuild(const Build &build)
 {
     // we insert builds by descending build number
-
     auto insertIt = std::find_if(
                         std::begin(m_builds),
                         std::end(m_builds),
                         [build](const auto &other) -> bool { return other.id() < build.id(); });
 
     auto index = static_cast<int>(insertIt - std::begin(m_builds));
-
 
     beginInsertRows(QModelIndex(), index, index);
     Build newBuild(build);
@@ -122,6 +128,16 @@ QVariant BuildsModel::data(const QModelIndex &index, int role) const
         return build.manualDownload();
     case Roles::BuildRef:
         return QVariant::fromValue(ucd::BuildRef{build});
+    case Roles::IsQueued:
+        return ServiceLocator::synchronizer()->isQueued(build);
+    case Roles::IsDownloading:
+        return ServiceLocator::synchronizer()->isDownloading(build);
+    case Roles::IsDownloaded:
+        return ServiceLocator::synchronizer()->isDownloaded(build);
+    case Roles::DownloadProgress:
+        return ServiceLocator::synchronizer()->downloadProgress(build);
+    case Roles::DownloadSpeed:
+        return ServiceLocator::synchronizer()->downloadSpeed(build);
     default:
         break;
     }
@@ -186,6 +202,11 @@ QHash<int, QByteArray> BuildsModel::roleNames() const
     roles[Roles::ArtifactPath] = "artifactPath";
     roles[Roles::ManualDownload] = "manualDownload";
     roles[Roles::BuildRef] = "buildRef";
+    roles[Roles::IsQueued] = "isQueued";
+    roles[Roles::IsDownloading] = "isDownloading";
+    roles[Roles::IsDownloaded] = "isDownloaded";
+    roles[Roles::DownloadProgress] = "downloadProgress";
+    roles[Roles::DownloadSpeed] = "downloadSpeed";
     return roles;
 }
 
@@ -246,6 +267,41 @@ void BuildsModel::onBuildsFetched(const QVector<Build> &builds)
         {
             addBuild(cloudBuild);
         }
+    }
+}
+
+void BuildsModel::updateDownloadStatus(const Build &build)
+{
+    auto buildIt = std::find_if(
+                       std::begin(m_builds),
+                       std::end(m_builds),
+                       [build](const auto &other) -> bool { return build.id() == other.id() && build.buildTargetId() == other.buildTargetId(); });
+    if (buildIt != std::end(m_builds))
+    {
+        auto row = static_cast<int>(buildIt - std::begin(m_builds));
+        emit dataChanged(index(row), index(row),
+                         QVector<int>{
+                                 Roles::ManualDownload,
+                                 Roles::IsQueued,
+                                 Roles::IsDownloading,
+                                 Roles::IsDownloaded});
+    }
+}
+
+void BuildsModel::updateDownloadProgress(const Build &build)
+{
+
+    auto buildIt = std::find_if(
+                       std::begin(m_builds),
+                       std::end(m_builds),
+                       [build](const auto &other) -> bool { return build.id() == other.id() && build.buildTargetId() == other.buildTargetId(); });
+    if (buildIt != std::end(m_builds))
+    {
+        auto row = static_cast<int>(buildIt - std::begin(m_builds));
+        emit dataChanged(index(row), index(row),
+                         QVector<int>{
+                                 Roles::DownloadProgress,
+                                 Roles::DownloadSpeed});
     }
 }
 
