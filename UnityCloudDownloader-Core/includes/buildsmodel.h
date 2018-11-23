@@ -31,6 +31,7 @@ public:
         ArtifactSize,
         ArtifactPath,
         ManualDownload,
+        BuildRef,
     };
 
     BuildsModel(QObject *parent = nullptr);

@@ -13,7 +13,7 @@ namespace ucd
 
 class Database;
 
-class UCD_SHARED_EXPORT AbstractSynchronizer : public QObject, ISynchronizer
+class UCD_SHARED_EXPORT AbstractSynchronizer : public QObject, public ISynchronizer
 {
     Q_OBJECT
 public:

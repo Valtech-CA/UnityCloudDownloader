@@ -17,6 +17,7 @@ namespace ucd
 class DatabasePrivate
 {
 public:
+    QString storagePath;
     QString connectionName;
 };
 
@@ -25,6 +26,7 @@ Database::Database(const QString &storagePath, QObject *parent)
     , p(std::make_unique<DatabasePrivate>())
 {
     auto filePath = QDir(storagePath).filePath("data.sqlite");
+    p->storagePath = filePath;
     p->connectionName = QUuid::createUuid().toString();
     auto database = QSqlDatabase::addDatabase("QSQLITE", p->connectionName);
     database.setDatabaseName(filePath);
@@ -64,6 +66,13 @@ bool Database::hasProfiles() const
 QSqlDatabase Database::sqlDatabase()
 {
     return QSqlDatabase::database(p->connectionName);
+}
+
+QSqlDatabase Database::sqlDatabase(const QString &newConnectionName)
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", newConnectionName);
+    db.setDatabaseName(p->storagePath);
+    return db;
 }
 
 }

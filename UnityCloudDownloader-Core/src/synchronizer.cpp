@@ -27,6 +27,7 @@ Synchronizer::Synchronizer(QObject *parent)
         m_workers[i] = new DownloadWorker();
         m_workers[i]->moveToThread(m_workerThreads[i]);
         connect(m_workers[i], &DownloadWorker::downloadCompleted, this, &Synchronizer::onDownloadCompleted, Qt::QueuedConnection);
+        m_workerThreads[i]->start();
     }
 }
 

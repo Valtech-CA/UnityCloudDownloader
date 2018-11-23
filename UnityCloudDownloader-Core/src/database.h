@@ -28,6 +28,7 @@ public:
     bool hasProfiles() const override;
 
     QSqlDatabase sqlDatabase() override;
+    QSqlDatabase sqlDatabase(const QString &newConnectionName) override;
 
 private:
     std::unique_ptr<DatabasePrivate> p;

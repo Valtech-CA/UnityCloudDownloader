@@ -140,6 +140,8 @@ ItemDelegate {
         anchors.rightMargin: 4
         visible: !!artifactPath
 
+        onClicked: downloadManually(buildRef)
+
         Image {
             fillMode: Image.PreserveAspectFit
             anchors.fill: parent

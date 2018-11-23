@@ -23,6 +23,7 @@ public:
     void updateProfile(const Profile &profile);
     void removeProfile(const QUuid &profileId);
     QVector<Profile> profiles(bool includeProjects = false);
+    Profile profile(const QUuid &profileId);
 
     QString getApiKey(const QUuid &profileId);
 

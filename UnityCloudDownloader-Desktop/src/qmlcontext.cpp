@@ -1,5 +1,9 @@
 #include "qmlcontext.h"
 
+#include "servicelocator.h"
+#include "abstractsynchronizer.h"
+#include "build.h"
+
 #include <QUrl>
 #include <QLocale>
 
@@ -15,4 +19,9 @@ QString QmlContext::urlToPath(const QUrl &url) const
 QString QmlContext::formattedDataSize(qint64 bytes) const
 {
     return QLocale().formattedDataSize(bytes);
+}
+
+void QmlContext::downloadManually(ucd::BuildRef build) const
+{
+    ucd::ServiceLocator::synchronizer()->manualDownload(build);
 }

@@ -18,6 +18,7 @@ public:
     virtual bool hasProfiles() const = 0;
 
     virtual QSqlDatabase sqlDatabase() = 0;
+    virtual QSqlDatabase sqlDatabase(const QString &newConnectionName) = 0;
 };
 
 }

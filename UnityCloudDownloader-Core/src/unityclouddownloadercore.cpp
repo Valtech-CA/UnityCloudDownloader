@@ -25,6 +25,7 @@ void Core::init()
     qRegisterMetaTypeStreamOperators<BuildTarget>("ucd_BuildTarget");
     qRegisterMetaType<Build>("ucd_Build");
     qRegisterMetaTypeStreamOperators<Build>("ucd_Build");
+    qRegisterMetaType<BuildRef>("ucd_BuildRef");
     QtConcurrent::run(&UnityApiClient::preconnect);
 }
 

@@ -120,6 +120,8 @@ QVariant BuildsModel::data(const QModelIndex &index, int role) const
         return build.artifactPath();
     case Roles::ManualDownload:
         return build.manualDownload();
+    case Roles::BuildRef:
+        return QVariant::fromValue(ucd::BuildRef{build});
     default:
         break;
     }
@@ -182,6 +184,8 @@ QHash<int, QByteArray> BuildsModel::roleNames() const
     roles[Roles::ArtifactName] = "artifactName";
     roles[Roles::ArtifactSize] = "artifactSize";
     roles[Roles::ArtifactPath] = "artifactPath";
+    roles[Roles::ManualDownload] = "manualDownload";
+    roles[Roles::BuildRef] = "buildRef";
     return roles;
 }
 

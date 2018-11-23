@@ -97,6 +97,29 @@ QVector<Profile> ProfileDao::profiles(bool includeProjects)
     return profiles;
 }
 
+Profile ProfileDao::profile(const QUuid &profileId)
+{
+    Profile profile;
+    QSqlQuery query(m_db);
+    query.prepare("SELECT * FROM Profiles WHERE profileId = :profileId");
+    query.bindValue(":profileId", profileId.toString());
+    if (!query.exec())
+    {
+        auto error = query.lastError().text().toUtf8();
+        qCritical("%s", error.data());
+        throw std::runtime_error(error);
+    }
+    else if (query.next())
+    {
+        profile.setUuid(QUuid::fromString(query.value("profileId").toString()));
+        profile.setName(query.value("name").toString());
+        profile.setRootPath(query.value("rootPath").toString());
+        profile.setApiKey(query.value("apiKey").toString());
+    }
+
+    return profile;
+}
+
 QString ProfileDao::getApiKey(const QUuid &profileId)
 {
     QSqlQuery query(m_db);
