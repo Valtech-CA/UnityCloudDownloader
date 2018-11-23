@@ -2,6 +2,7 @@
 #define UCD_SYNCHRONIZER_H
 
 #include "abstractsynchronizer.h"
+#include "build.h"
 
 #include <QVector>
 
@@ -33,6 +34,9 @@ public:
 
     void queueDownload(const Build &build);
     void startDownload(const Build &build);
+
+private slots:
+    void onDownloadCompleted(Build build);
 
 private:
     QVector<BuildRef> m_processingBuilds;

@@ -21,7 +21,7 @@ void ProfileDao::init()
                "Profiles (profileId TEXT PRIMARY KEY, name TEXT, rootPath TEXT, apiKey TEXT)"))
     {
         auto error = query.lastError().text().toUtf8();
-        qFatal(error);
+        qFatal("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -38,7 +38,7 @@ void ProfileDao::addProfile(const Profile &profile)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -55,7 +55,7 @@ void ProfileDao::updateProfile(const Profile &profile)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -68,7 +68,7 @@ void ProfileDao::removeProfile(const QUuid &profileId)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 
@@ -109,7 +109,7 @@ QString ProfileDao::getApiKey(const QUuid &profileId)
         return query.value("apiKey").toString();
     }
 
-    return "";
+    return {};
 }
 
 }

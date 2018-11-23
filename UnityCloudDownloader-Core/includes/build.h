@@ -86,4 +86,6 @@ private:
 QDataStream &operator<<(QDataStream &out, const ucd::Build &value);
 QDataStream &operator>>(QDataStream &in, ucd::Build &dest);
 
+Q_DECLARE_METATYPE(ucd::Build)
+
 #endif // UCD_BUILD_H

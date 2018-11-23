@@ -5,6 +5,7 @@
 
 #include "unityclouddownloader-core_global.h"
 
+#include <QObject>
 #include <QUuid>
 
 namespace ucd
@@ -14,6 +15,7 @@ class Build;
 
 class UCD_SHARED_EXPORT BuildRef
 {
+    Q_GADGET
 public:
     BuildRef();
     BuildRef(const Build &build);
@@ -36,5 +38,7 @@ private:
 };
 
 }
+
+Q_DECLARE_METATYPE(ucd::BuildRef)
 
 #endif // UCD_BUILDREF_H
