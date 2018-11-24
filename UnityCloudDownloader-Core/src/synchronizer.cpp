@@ -104,6 +104,7 @@ bool Synchronizer::isDownloaded(const Build &build) const
     {
         qCritical("missmatch in binary search vs contains");
         qDebug() << m_downloadedBuilds;
+        return !result;
     }
 
     return result;
