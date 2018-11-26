@@ -33,15 +33,16 @@ bool BuildRef::operator==(const BuildRef &other) const
 
 bool BuildRef::operator<(const BuildRef &other) const
 {
-    if (m_buildTargetId < other.m_buildTargetId)
-        return true;
+    if (m_buildTargetId != other.m_buildTargetId)
+    {
+        return m_buildTargetId < other.m_buildTargetId;
+    }
     return m_buildNumber < other.m_buildNumber;
 }
 
 BuildRef::operator Build() const
 {
     return BuildDao(ServiceLocator::database()).build(m_buildTargetId, m_buildNumber);
-
 }
 
 } // namespace ucd

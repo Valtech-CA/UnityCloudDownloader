@@ -1,7 +1,12 @@
 #include "synchronizer.h"
 
 #include "build.h"
+#include "buildtarget.h"
+#include "project.h"
+#include "profile.h"
+#include "profiledao.h"
 #include "downloadworker.h"
+#include "servicelocator.h"
 
 #include <algorithm>
 
@@ -150,7 +155,19 @@ void Synchronizer::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == m_updateTimer)
     {
-        // TODO: compute changes and queue new downloads
+        auto profiles = ProfileDao(ServiceLocator::database()).profiles(true);
+        for (const Profile &profile : profiles)
+        {
+            for (const Project &project : profile.projects())
+            {
+                for (const BuildTarget &buildTarget : project.buildTargets())
+                {
+                    if (!buildTarget.sync())
+                        continue;
+                    // TODO: compute changes and queue new downloads
+                }
+            }
+        }
     }
     else if (event->timerId() == m_progressTick)
     {

@@ -26,7 +26,7 @@ void ProjectDao::init()
                     "iconPath TEXT)"))
     {
         auto error = query.lastError().text().toUtf8();
-        qFatal(error);
+        qFatal("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -45,7 +45,7 @@ void ProjectDao::addProject(const Project &project)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -61,7 +61,7 @@ void ProjectDao::updateProject(const Project &project)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -74,7 +74,7 @@ void ProjectDao::removeProject(const QUuid &projectId)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 
