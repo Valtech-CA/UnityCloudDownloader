@@ -28,7 +28,7 @@ public:
     explicit ProfilesModel(QObject *parent = nullptr);
     virtual ~ProfilesModel() override;
 
-    QModelIndex createProfile(const QString &name, const QString &apiKey, const QString &rootPath);
+    Q_INVOKABLE QModelIndex createProfile(const QString &name, const QString &apiKey, const QString &rootPath);
     QModelIndex addProfile(const Profile &profile);
 
     Q_INVOKABLE bool remove(int index, int count = 1);

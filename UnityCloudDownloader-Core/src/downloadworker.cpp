@@ -14,6 +14,7 @@
 #include <QNetworkReply>
 #include <QDir>
 #include <QFile>
+#include <QProcess>
 
 namespace ucd
 {
@@ -75,12 +76,12 @@ void DownloadWorker::onDownloadRequested(Build build)
                                QString::number(build.id())));
     m_storagePath = storageDir.absolutePath();
     storageDir.mkpath(m_storagePath);
-    auto filePath = storageDir.filePath(build.artifactName());
-    m_outFile = std::make_unique<QFile>(filePath);
+    m_filePath = storageDir.filePath(build.artifactName());
+    m_outFile = std::make_unique<QFile>(m_filePath);
     if (!m_outFile->open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
         m_outFile = nullptr;
-        qCritical("Cannot create file %s for writing", filePath.toUtf8().data());
+        qCritical("Cannot create file %s for writing", m_filePath.toUtf8().data());
         emit downloadFailed(build);
         return;
     }
@@ -122,8 +123,25 @@ void DownloadWorker::onDownloadFinished()
     else
     {
         m_reply = nullptr;
+#ifdef Q_OS_WIN
+        auto *unzip = new QProcess(this);
+        QStringList args{
+            QStringLiteral("-nologo"),
+            QStringLiteral("-noprofile"),
+            QStringLiteral("-command"),
+            QStringLiteral("& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('%1', '%2'); }")
+            .arg(m_filePath, m_storagePath)
+        };
+        unzip->setProgram(QStringLiteral("powershell.exe"));
+        unzip->setArguments(args);
+        void (QProcess::*finished)(int) = &QProcess::finished; // finished is overloaded which prevents auto selection
+        connect(unzip, finished, this, &DownloadWorker::onUnzipFinished);
+        connect(unzip, finished, unzip, &QProcess::deleteLater);
+        unzip->start();
+#else
         m_busy = false;
         emit downloadCompleted(m_build);
+#endif
     }
 }
 
@@ -140,6 +158,22 @@ void DownloadWorker::onProgressRequested()
     m_lastSize = currentSize;
 
     emit downloadUpdated(m_build, ratio, speed);
+}
+
+void DownloadWorker::onUnzipFinished(int exitCode)
+{
+    if (exitCode == 0)
+    {
+        QFile::remove(m_filePath);
+        m_busy = false;
+        emit downloadCompleted(m_build);
+    }
+    else
+    {
+        qCritical("unzip failed");
+        m_busy = false;
+        emit downloadFailed(m_build);
+    }
 }
 
 }

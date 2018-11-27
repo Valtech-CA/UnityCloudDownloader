@@ -44,6 +44,7 @@ private slots:
     void onReadyRead();
     void onDownloadFinished();
     void onProgressRequested();
+    void onUnzipFinished(int exitCode);
 
 private:
     QUuid m_connectionId;
@@ -51,6 +52,7 @@ private:
     QNetworkAccessManager *m_network;
     Build m_build;
     QString m_storagePath;
+    QString m_filePath;
     std::unique_ptr<QFile> m_outFile;
     QByteArray m_buffer;
     QNetworkReply *m_reply;
