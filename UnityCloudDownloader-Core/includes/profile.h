@@ -9,6 +9,7 @@
 #include <QString>
 #include <QUuid>
 #include <QVector>
+#include <QObject>
 
 namespace ucd
 {
@@ -17,6 +18,10 @@ typedef QVector<Project> ProjectList;
 
 class UCD_SHARED_EXPORT Profile
 {
+    Q_GADGET
+    Q_PROPERTY(QString name READ name WRITE setName)
+    Q_PROPERTY(QString apiKey READ apiKey WRITE setApiKey)
+    Q_PROPERTY(QString rootPath READ rootPath WRITE setRootPath)
 public:
     Profile();
     Profile(const Profile &other) = default;

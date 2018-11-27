@@ -57,6 +57,9 @@ public:
     const QString& artifactPath() const { return m_artifactPath; }
     bool manualDownload() const { return m_manual; }
 
+    QString downloadFolderPath() const;
+    QString downloadFilePath() const;
+
     void setName(QString name);
     void setId(int id);
     void setStatus(int status);

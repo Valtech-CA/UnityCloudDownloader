@@ -37,6 +37,27 @@ QModelIndex ProfilesModel::addProfile(const Profile &profile)
     return index(m_profiles.count() - 1);
 }
 
+Profile ProfilesModel::profile(int row) const
+{
+    if (row < m_profiles.size())
+        return m_profiles.at(row);
+    return {};
+}
+
+void ProfilesModel::updateProfile(Profile profile)
+{
+    for (int i = 0, end = m_profiles.size(); i < end; ++i)
+    {
+        if (m_profiles.at(i).uuid() == profile.uuid())
+        {
+            ProfileDao(ServiceLocator::database()).updateProfile(profile);
+            m_profiles[i] = profile;
+            emit dataChanged(index(i), index(i));
+            return;
+        }
+    }
+}
+
 bool ProfilesModel::remove(int index, int count)
 {
     return removeRows(index, count, QModelIndex());

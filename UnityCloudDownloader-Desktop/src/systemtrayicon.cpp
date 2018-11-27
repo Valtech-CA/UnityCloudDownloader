@@ -3,6 +3,7 @@
 #include "qmlcontext.h"
 
 #include "servicelocator.h"
+#include "abstractsynchronizer.h"
 #include "unityapiclient.h"
 #include "profilesmodel.h"
 #include "projectsmodel.h"
@@ -16,6 +17,8 @@
 #include <QQmlApplicationEngine>
 #include <QQuickWindow>
 #include <QQmlContext>
+#include <QFileInfo>
+#include <QDesktopServices>
 
 SystemTrayIcon::SystemTrayIcon(QObject *parent)
     : QSystemTrayIcon(parent)
@@ -30,14 +33,23 @@ SystemTrayIcon::SystemTrayIcon(QObject *parent)
     auto configureAction = new QAction(tr("&Configure"), this);
     connect(configureAction, &QAction::triggered, this, &SystemTrayIcon::onConfigure);
 
+    auto refreshAction = new QAction(tr("&Refresh"), this);
+    connect(refreshAction, &QAction::triggered, this, &SystemTrayIcon::onRefresh);
+
     m_menu = new QMenu();
     m_menu->addAction(configureAction);
+    m_menu->addAction(refreshAction);
     m_menu->addSeparator();
     m_menu->addAction(m_quitAction);
 
     setContextMenu(m_menu);
     setToolTip(tr("Unity Cloud Downloader"));
     setIcon(QIcon(":/icons/UnityCloudLogo2.png"));
+
+    auto synchronizer = ucd::ServiceLocator::synchronizer();
+    connect(synchronizer, &ucd::AbstractSynchronizer::downloadCompleted, this, &SystemTrayIcon::onDownloadCompleted);
+
+    connect(this, &QSystemTrayIcon::messageClicked, this, &SystemTrayIcon::onMessageClicked);
 }
 
 void SystemTrayIcon::onConfigure()
@@ -61,4 +73,21 @@ void SystemTrayIcon::onConfigure()
     {
         m_window->show();
     }
+}
+
+void SystemTrayIcon::onRefresh()
+{
+    ucd::ServiceLocator::synchronizer()->refresh();
+}
+
+void SystemTrayIcon::onDownloadCompleted(ucd::Build build)
+{
+    m_lastBuildDownloaded = build;
+    showMessage(tr("%1 build %2 downloaded").arg(build.name(), QString::number(build.id())), build.downloadFolderPath());
+}
+
+void SystemTrayIcon::onMessageClicked()
+{
+    auto dirPath = ucd::Build(m_lastBuildDownloaded).downloadFolderPath();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dirPath));
 }

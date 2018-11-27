@@ -40,7 +40,7 @@ ItemDelegate {
         anchors.bottom: downloadProgressBar.top
         anchors.bottomMargin: 2
         text: formattedDataSize(downloadSpeed) + "/s"
-        visible: isDownloading
+        visible: isDownloading && downloadProgress < 1
     }
 
     Image {
@@ -168,6 +168,26 @@ ItemDelegate {
             anchors.fill: parent
             anchors.margins: 8
             source: "download.png"
+            scale: parent.pressed ? 0.95 : parent.hovered ? 1 : 0.9
+        }
+    }
+
+    ToolButton {
+        id: openFolder
+        width: 60
+        height: 60
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: statusIcon.left
+        anchors.rightMargin: 4
+        visible: isDownloaded
+
+        onClicked: openBuildFolder(buildRef)
+
+        Image {
+            fillMode: Image.PreserveAspectFit
+            anchors.fill: parent
+            anchors.margins: 8
+            source: "folder.png"
             scale: parent.pressed ? 0.95 : parent.hovered ? 1 : 0.9
         }
     }

@@ -28,5 +28,8 @@
         <file>arrow-sync.png</file>
         <file>cloud-sync.png</file>
         <file>sarrow-sync.png</file>
+        <file>folder.png</file>
+        <file>white-sync.png</file>
+        <file>EditProfile.qml</file>
     </qresource>
 </RCC>

@@ -29,7 +29,7 @@ enum
 {
     ProgressInterval = 300,
     ThreadJoinTimout = 2000,
-    UpdateInterval = 2 * 60 * 1000 / 8,
+    UpdateInterval = 2 * 60 * 1000,
 };
 
 Synchronizer::Synchronizer(QObject *parent)
@@ -109,6 +109,23 @@ void Synchronizer::manualDownload(const Build &build)
     startDownload(build);
 }
 
+void Synchronizer::refresh()
+{
+    auto profiles = ProfileDao(ServiceLocator::database()).profiles(true);
+    for (const Profile &profile : profiles)
+    {
+        for (const Project &project : profile.projects())
+        {
+            for (const BuildTarget &buildTarget : project.buildTargets())
+            {
+                if (buildTarget.sync())
+                    m_apiClient->fetchBuilds(buildTarget);
+                syncTarget(profile, project, buildTarget);
+            }
+        }
+    }
+}
+
 bool Synchronizer::isQueued(const Build &build) const
 {
     return m_queuedBuilds.contains(build);
@@ -172,20 +189,7 @@ void Synchronizer::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == m_updateTimer)
     {
-        auto profiles = ProfileDao(ServiceLocator::database()).profiles(true);
-        for (const Profile &profile : profiles)
-        {
-            for (const Project &project : profile.projects())
-            {
-                for (const BuildTarget &buildTarget : project.buildTargets())
-                {
-                    if (!buildTarget.sync())
-                        continue;
-                    m_apiClient->fetchBuilds(buildTarget);
-                    syncTarget(profile, project, buildTarget);
-                }
-            }
-        }
+        refresh();
     }
     else if (event->timerId() == m_progressTick)
     {
@@ -277,8 +281,18 @@ void Synchronizer::syncTarget(const Profile &profile, const Project &project, co
 {
     QDir targetDir(QStringLiteral("%1/%2/%3").arg(profile.rootPath(), project.cloudId(), buildTarget.cloudId()));
     if (!targetDir.exists())
+    {
+        DownloadsDao downloadsDao(ServiceLocator::database());
+        auto downloads = downloadsDao.downloadedBuilds(buildTarget.id());
+        for (auto download : downloads)
+        {
+            downloadsDao.removeDownload(download);
+            m_downloadedBuilds.removeOne(download);
+        }
         return; // nothing to see there
+    }
 
+    const bool sync = buildTarget.sync();
     auto subFolders = targetDir.entryList(QDir::Dirs);
     QVector<Build> buildsToDelete;
     auto now = QDateTime::currentDateTime();
@@ -307,6 +321,12 @@ void Synchronizer::syncTarget(const Profile &profile, const Project &project, co
             }
             continue;
         }
+
+        // if the target is not set to sync, skip the remainder
+        // all we wanted to do was to update deleted builds
+        if (!sync)
+            continue;
+
         if (build.manualDownload())
         {
             ++upCount;
@@ -318,6 +338,10 @@ void Synchronizer::syncTarget(const Profile &profile, const Project &project, co
             buildsToDelete.append(build);
         }
     }
+
+    // if the target is not set to sync, skip the remainder
+    if (!sync)
+        return;
 
     // sort builds to delete by oldest first
     std::sort(

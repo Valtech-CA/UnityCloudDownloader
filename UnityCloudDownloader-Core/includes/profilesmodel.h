@@ -4,6 +4,7 @@
 #pragma once
 
 #include "unityclouddownloader-core_global.h"
+#include "profile.h"
 
 #include <QAbstractListModel>
 #include <QVector>
@@ -30,6 +31,9 @@ public:
 
     Q_INVOKABLE QModelIndex createProfile(const QString &name, const QString &apiKey, const QString &rootPath);
     QModelIndex addProfile(const Profile &profile);
+
+    Q_INVOKABLE ucd::Profile profile(int row) const;
+    Q_INVOKABLE void updateProfile(ucd::Profile profile);
 
     Q_INVOKABLE bool remove(int index, int count = 1);
 

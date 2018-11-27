@@ -21,6 +21,7 @@ public:
     virtual float downloadProgress(const Build &build) const = 0;
     virtual qint64 downloadSpeed(const Build &build) const = 0;
     virtual void manualDownload(const Build &build) = 0;
+    virtual void refresh() = 0;
 };
 
 }

@@ -1,5 +1,14 @@
 #include "build.h"
 
+#include "buildtarget.h"
+#include "buildtargetdao.h"
+#include "project.h"
+#include "projectdao.h"
+#include "profile.h"
+#include "profiledao.h"
+#include "servicelocator.h"
+
+#include <QSqlDatabase>
 #include <QDataStream>
 
 namespace ucd
@@ -54,6 +63,33 @@ void Build::takeFrom(const Build &other)
     m_artifactName = other.m_artifactName;
     m_artifactSize = other.m_artifactSize;
     m_artifactPath = other.m_artifactPath;
+}
+
+QString Build::downloadFolderPath() const
+{
+    auto db = ServiceLocator::database();
+    auto target = BuildTargetDao(db).buildTarget(m_buildTargetId);
+    auto project = ProjectDao(db).project(target.projectId());
+    auto profile = ProfileDao(db).profile(project.profileId());
+    return QStringLiteral("%1/%2/%3/%4").arg(
+                profile.rootPath(),
+                project.cloudId(),
+                target.cloudId(),
+                QString::number(m_buildNumber));
+}
+
+QString Build::downloadFilePath() const
+{
+    auto db = ServiceLocator::database();
+    auto target = BuildTargetDao(db).buildTarget(m_buildTargetId);
+    auto project = ProjectDao(db).project(target.projectId());
+    auto profile = ProfileDao(db).profile(project.profileId());
+    return QStringLiteral("%1/%2/%3/%4/%5").arg(
+                profile.rootPath(),
+                project.cloudId(),
+                target.cloudId(),
+                QString::number(m_buildNumber),
+                m_artifactName);
 }
 
 void Build::setName(QString name)

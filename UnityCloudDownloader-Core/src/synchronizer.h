@@ -35,6 +35,7 @@ public:
 
     void processQueue();
     void manualDownload(const Build &build) override;
+    void refresh() override;
 
     bool isQueued(const Build &build) const override;
     bool isDownloaded(const Build &build) const override;

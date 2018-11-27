@@ -15,12 +15,25 @@ Page {
             spacing: 8
 
             Button {
+                id: refreshButton
+                Layout.leftMargin: 10
+                Image {
+                    fillMode: Image.PreserveAspectFit
+                    anchors.fill: parent
+                    anchors.margins: 4
+                    source: "white-sync.png"
+                    scale: parent.pressed ? 0.95 : parent.hovered ? 1 : 0.9
+                }
+
+                onClicked: refreshSync()
+            }
+
+            Button {
                 id: addButton
                 text: qsTr("Add")
                 Layout.fillWidth: true
-                Layout.leftMargin: 10
                 onClicked: {
-                    mainStack.push("./AddProfile.qml", {
+                    mainStack.push("AddProfile.qml", {
                                        "profilesModel": profilesModel
                                    })
                 }
@@ -42,6 +55,7 @@ Page {
                 Layout.fillWidth: true
                 Layout.rightMargin: 10
                 enabled: profileListView.currentIndex !== -1
+                onClicked: mainStack.push("EditProfile.qml", { "profilesModel": profilesModel, "profile": profilesModel.profile(profileListView.currentIndex) })
             }
         }
     }

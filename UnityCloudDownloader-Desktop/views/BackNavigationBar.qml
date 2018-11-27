@@ -6,6 +6,20 @@ ToolBar {
     RowLayout {
         anchors.fill: parent
 
+        Button {
+            id: refreshButton
+            Layout.leftMargin: 10
+            Image {
+                fillMode: Image.PreserveAspectFit
+                anchors.fill: parent
+                anchors.margins: 4
+                source: "white-sync.png"
+                scale: parent.pressed ? 0.95 : parent.hovered ? 1 : 0.9
+            }
+
+            onClicked: refreshSync()
+        }
+
         Item {
             Layout.fillWidth: true
         }
