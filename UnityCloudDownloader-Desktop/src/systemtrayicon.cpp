@@ -52,6 +52,11 @@ SystemTrayIcon::SystemTrayIcon(QObject *parent)
     connect(this, &QSystemTrayIcon::messageClicked, this, &SystemTrayIcon::onMessageClicked);
 }
 
+void SystemTrayIcon::configure()
+{
+    onConfigure();
+}
+
 void SystemTrayIcon::onConfigure()
 {
     if (m_qmlEngine == nullptr)

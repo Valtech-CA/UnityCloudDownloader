@@ -1,6 +1,8 @@
 #include "systemtrayicon.h"
 
 #include "unityclouddownloadercore.h"
+#include "servicelocator.h"
+#include "idatabaseprovider.h"
 
 #include <QApplication>
 #include <QSystemTrayIcon>
@@ -18,7 +20,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("UnityCloudDownloader");
 
     QApplication a(argc, argv);
-    QApplication::setQuitOnLastWindowClosed(true);
+    QApplication::setQuitOnLastWindowClosed(false);
 
     if (!QSystemTrayIcon::isSystemTrayAvailable())
     {
@@ -40,7 +42,10 @@ int main(int argc, char *argv[])
     SystemTrayIcon trayIcon;
     trayIcon.show();
 
-    QMetaObject::invokeMethod(&trayIcon, "onConfigure");
+    if (!ucd::ServiceLocator::databaseProvider()->hasProfiles())
+    {
+        trayIcon.configure();
+    }
 
     return a.exec();
 }

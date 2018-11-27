@@ -17,6 +17,8 @@ public:
     explicit SystemTrayIcon(QObject *parent = nullptr);
     virtual ~SystemTrayIcon() override = default;
 
+    void configure();
+
 private slots:
     void onConfigure();
     void onRefresh();
