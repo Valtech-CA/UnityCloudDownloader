@@ -29,7 +29,7 @@ void BuildTargetDao::init()
                "maxDaysOld INT)"))
     {
         auto error = query.lastError().text().toUtf8();
-        qFatal(error);
+        qFatal("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -54,7 +54,7 @@ void BuildTargetDao::addBuildTarget(const BuildTarget &buildTarget)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -75,7 +75,7 @@ void BuildTargetDao::updateBuildTarget(const BuildTarget &buildTarget)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -88,7 +88,7 @@ void BuildTargetDao::removeBuildTarget(const QUuid &buildTargetId)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 

@@ -106,7 +106,7 @@ QVector<Project> ProjectDao::projects(const QUuid &profileId, bool includeBuildT
         project.setIconPath(query.value("iconPath").toString());
         if (includeBuildTargets)
         {
-            project.setBuildTargets(BuildTargetDao(m_db).buildTargets(project.profileId(), true));
+            project.setBuildTargets(BuildTargetDao(m_db).buildTargets(project.id(), true));
         }
         projects.append(std::move(project));
     }

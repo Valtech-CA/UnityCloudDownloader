@@ -1,6 +1,8 @@
 #ifndef UCD_PROJECTDAO_H
 #define UCD_PROJECTDAO_H
 
+#pragma once
+
 #include <QVector>
 #include <QSqlDatabase>
 

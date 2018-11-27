@@ -1,6 +1,8 @@
 #ifndef UCD_SYNCHRONIZER_H
 #define UCD_SYNCHRONIZER_H
 
+#pragma once
+
 #include "abstractsynchronizer.h"
 
 #include <QVector>
@@ -12,9 +14,13 @@ class QThread;
 namespace ucd
 {
 
+class Profile;
+class Project;
+class BuildTarget;
 class Database;
 class BuildRef;
 class DownloadWorker;
+class UnityApiClient;
 
 class Synchronizer : public AbstractSynchronizer
 {
@@ -46,14 +52,18 @@ private slots:
     void onDownloadCompleted(ucd::Build build);
     void onDownloadFailed(ucd::Build build);
     void onDownloadUpdated(ucd::Build build, float ratio, qint64 speed);
+    void onBuildsFetched(const QVector<Build> &builds);
 
 private:
+    void syncTarget(const Profile &profile, const Project &project, const BuildTarget &buildTarget);
+
     QVector<BuildRef> m_processingBuilds;
     QVector<BuildRef> m_queuedBuilds;
     QVector<BuildRef> m_downloadedBuilds;
     QThread *m_workerThreads[WorkerCount];
     DownloadWorker *m_workers[WorkerCount];
     QMap<BuildRef, QPair<float, qint64>> m_downloadStats;
+    UnityApiClient *m_apiClient;
     int m_updateTimer;
     int m_progressTick;
 };

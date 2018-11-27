@@ -34,6 +34,7 @@ class UCD_SHARED_EXPORT BuildRef
 public:
     BuildRef();
     BuildRef(const Build &build);
+    BuildRef(QUuid buildTargetId, int buildNumber);
     BuildRef(const BuildRef &) = default;
     BuildRef(BuildRef&&) noexcept = default;
     ~BuildRef() = default;
@@ -46,6 +47,9 @@ public:
     bool operator<(const BuildRef &other) const;
 
     operator Build() const;
+
+    QUuid buildTargetId() const { return m_buildTargetId; }
+    int buildNumber() const { return m_buildNumber; }
 
 private:
     QUuid m_buildTargetId;

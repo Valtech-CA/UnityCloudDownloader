@@ -1,18 +1,25 @@
 #include "synchronizer.h"
 
 #include "build.h"
+#include "builddao.h"
 #include "buildtarget.h"
+#include "buildtargetdao.h"
 #include "project.h"
+#include "projectdao.h"
 #include "profile.h"
 #include "profiledao.h"
+#include "downloadsdao.h"
 #include "downloadworker.h"
 #include "servicelocator.h"
+#include "unityapiclient.h"
+#include "idatabaseprovider.h"
 
 #include <algorithm>
 
 #include <QThread>
 #include <QtConcurrent>
-
+#include <QDir>
+#include <QDateTime>
 #include <QDebug>
 
 namespace ucd
@@ -22,16 +29,19 @@ enum
 {
     ProgressInterval = 300,
     ThreadJoinTimout = 2000,
-    UpdateInterval = 2 * 60 * 1000,
+    UpdateInterval = 2 * 60 * 1000 / 8,
 };
 
 Synchronizer::Synchronizer(QObject *parent)
     : AbstractSynchronizer(parent)
     , m_workerThreads{}
     , m_workers{}
+    , m_apiClient(nullptr)
     , m_updateTimer(0)
     , m_progressTick(0)
 {
+    m_apiClient = new UnityApiClient(this);
+    connect(m_apiClient, &UnityApiClient::buildsFetched, this, &Synchronizer::onBuildsFetched);
     m_updateTimer = startTimer(UpdateInterval);
     m_progressTick = startTimer(ProgressInterval);
     for (int i = 0; i < WorkerCount; ++i)
@@ -44,6 +54,10 @@ Synchronizer::Synchronizer(QObject *parent)
         connect(m_workers[i], &DownloadWorker::downloadUpdated, this, &Synchronizer::onDownloadUpdated, Qt::QueuedConnection);
         m_workerThreads[i]->start();
     }
+
+    auto downloads = DownloadsDao(ServiceLocator::database()).downloadedBuilds();
+    std::sort(std::begin(downloads), std::end(downloads));
+    m_downloadedBuilds = std::move(downloads);
 }
 
 Synchronizer::~Synchronizer()
@@ -86,6 +100,9 @@ void Synchronizer::processQueue()
 
 void Synchronizer::manualDownload(const Build &build)
 {
+    Build updatedBuild(build);
+    updatedBuild.setManualDownload(true);
+    BuildDao(ServiceLocator::database()).updateBuild(updatedBuild);
     // don't download if it is already queued or downloaded
     if (isDownloading(build) || isQueued(build) || isDownloaded(build))
         return;
@@ -164,7 +181,8 @@ void Synchronizer::timerEvent(QTimerEvent *event)
                 {
                     if (!buildTarget.sync())
                         continue;
-                    // TODO: compute changes and queue new downloads
+                    m_apiClient->fetchBuilds(buildTarget);
+                    syncTarget(profile, project, buildTarget);
                 }
             }
         }
@@ -191,6 +209,7 @@ void Synchronizer::onDownloadCompleted(Build build)
                 build);
     m_downloadedBuilds.insert(insertIt, build);
     m_downloadStats.remove(build);
+    DownloadsDao(ServiceLocator::database()).addDownload(build);
     emit downloadCompleted(build);
     processQueue();
 }
@@ -212,6 +231,129 @@ void Synchronizer::onDownloadUpdated(Build build, float ratio, qint64 speed)
 {
     m_downloadStats[build] = qMakePair(ratio, speed);
     emit downloadUpdated(build);
+}
+
+void Synchronizer::onBuildsFetched(const QVector<Build> &builds)
+{
+    if (builds.isEmpty())
+    {
+        qWarning("fetching builds returned empty");
+        return;
+    }
+
+    auto now = QDateTime::currentDateTime();
+    auto db = ServiceLocator::database();
+    auto buildTarget = BuildTargetDao(db).buildTarget(builds[0].buildTargetId());
+
+    if (!buildTarget.sync())
+    {
+        qInfo("synching was disabled since we requested %s", buildTarget.name().toUtf8().data());
+        return;
+    }
+
+    auto project = ProjectDao(db).project(buildTarget.projectId());
+    auto profile = ProfileDao(db).profile(project.profileId());
+
+    int buildCount = 0;
+
+    for (int i = 0, end = builds.size(); i < end; ++i)
+    {
+        const Build &build = builds.at(i);
+        if (build.status() != Build::Status::Success || build.createTime().daysTo(now) > buildTarget.maxDaysOld())
+            continue;
+
+        BuildRef buildRef(build);
+        if (!isDownloading(buildRef) && !isQueued(buildRef) && !isDownloaded(buildRef))
+        {
+            queueDownload(build);
+        }
+
+        if (++buildCount >= buildTarget.maxBuilds())
+            break;
+    }
+}
+
+void Synchronizer::syncTarget(const Profile &profile, const Project &project, const BuildTarget &buildTarget)
+{
+    QDir targetDir(QStringLiteral("%1/%2/%3").arg(profile.rootPath(), project.cloudId(), buildTarget.cloudId()));
+    if (!targetDir.exists())
+        return; // nothing to see there
+
+    auto subFolders = targetDir.entryList(QDir::Dirs);
+    QVector<Build> buildsToDelete;
+    auto now = QDateTime::currentDateTime();
+    DownloadsDao downloadsDao(ServiceLocator::database());
+    BuildDao buildDao(ServiceLocator::database());
+    auto downloadedBuilds = downloadsDao.downloadedBuilds(buildTarget.id());
+    // sort with newer builds first
+    std::sort(std::begin(downloadedBuilds), std::end(downloadedBuilds),
+              [](BuildRef rhs, BuildRef lhs) -> bool { return rhs.buildNumber() > lhs.buildNumber(); });
+    int itemCount = downloadedBuilds.size();
+    int upCount = 0;
+    for (auto buildRef : downloadedBuilds)
+    {
+        Build build = buildRef;
+        if (!subFolders.contains(QString::number(buildRef.buildNumber())))
+        {
+            // folder removed, update status
+            downloadsDao.removeDownload(buildRef);
+            m_downloadedBuilds.removeOne(buildRef);
+            --itemCount;
+            // if that build was a manual download, clear the flag
+            if (build.manualDownload())
+            {
+                build.setManualDownload(false);
+                buildDao.updateBuild(build);
+            }
+            continue;
+        }
+        if (build.manualDownload())
+        {
+            ++upCount;
+            continue; // manual downloads bypass garbage collect
+        }
+
+        if (++upCount > buildTarget.maxBuilds() || build.createTime().daysTo(now) > buildTarget.maxDaysOld())
+        {
+            buildsToDelete.append(build);
+        }
+    }
+
+    // sort builds to delete by oldest first
+    std::sort(
+                std::begin(buildsToDelete),
+                std::end(buildsToDelete),
+                [](const Build &rhs, const Build &lhs) -> bool
+    {
+        return rhs.createTime() > lhs.createTime();
+    });
+
+    for (auto build : buildsToDelete)
+    {
+        if (--itemCount < buildTarget.minBuilds())
+            break;
+        // remove old build
+        downloadsDao.removeDownload(build);
+        m_downloadedBuilds.removeOne(build);
+        // TODO: delete in the background, better
+        QDir buildDir(targetDir);
+        if (buildDir.cd(QString::number(build.id())))
+        {
+            auto removeTask = [](QDir dir, BuildRef buildRef)
+            {
+                if (dir.removeRecursively())
+                {
+                    QUuid connectionId(QUuid::createUuid());
+                    auto db = ServiceLocator::databaseProvider()->sqlDatabase(connectionId.toString());
+                    db.open();
+                    DownloadsDao(db).removeDownload(buildRef);
+                    db.close();
+                    QSqlDatabase::removeDatabase(connectionId.toString());
+                }
+            };
+            QtConcurrent::run(removeTask, buildDir, BuildRef(build));
+        }
+    }
 }
 
 } // namespace ucd

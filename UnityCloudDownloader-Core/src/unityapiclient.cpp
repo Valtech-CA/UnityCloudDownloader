@@ -1,8 +1,12 @@
 #include "unityapiclient.h"
 
+#include "profile.h"
+#include "profiledao.h"
 #include "project.h"
+#include "projectdao.h"
 #include "buildtarget.h"
 #include "build.h"
+#include "servicelocator.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -64,6 +68,16 @@ void UnityApiClient::fetchProjects()
     connect(reply, &QNetworkReply::finished, this, &UnityApiClient::projectsReceived);
 }
 
+void UnityApiClient::fetchProjects(const Profile &profile)
+{
+    QNetworkRequest request(QUrl{API("/projects")});
+    setAuthorization(request, profile.apiKey());
+
+    auto *reply = m_networkManager->get(request);
+    reply->setProperty("profile", QVariant::fromValue(profile));
+    connect(reply, &QNetworkReply::finished, this, &UnityApiClient::projectsReceived);
+}
+
 void UnityApiClient::fetchBuildTargets(const QString &orgId, const QString &projectId)
 {
     QNetworkRequest request(QUrl{API("/orgs/%1/projects/%2/buildtargets").arg(orgId, projectId)});
@@ -73,12 +87,38 @@ void UnityApiClient::fetchBuildTargets(const QString &orgId, const QString &proj
     connect(reply, &QNetworkReply::finished, this, &UnityApiClient::buildTargetsReceived);
 }
 
+void UnityApiClient::fetchBuildTargets(const Project &project)
+{
+    auto apiKey = ProfileDao(ServiceLocator::database()).getApiKey(project.profileId());
+    QNetworkRequest request(QUrl{API("/orgs/%1/projects/%2/buildtargets").arg(project.organisationId(), project.cloudId())});
+    setAuthorization(request, apiKey);
+
+    auto *reply = m_networkManager->get(request);
+    reply->setProperty("project", QVariant::fromValue(project));
+    connect(reply, &QNetworkReply::finished, this, &UnityApiClient::buildTargetsReceived);
+}
+
 void UnityApiClient::fetchBuilds(const QString &orgId, const QString &projectId, const QString &buildTargetId)
 {
     QNetworkRequest request(QUrl{API("/orgs/%1/projects/%2/buildtargets/%3/builds").arg(orgId, projectId, buildTargetId)});
     setAuthorization(request, m_apiKey);
 
     auto *reply = m_networkManager->get(request);
+    connect(reply, &QNetworkReply::finished, this, &UnityApiClient::buildsReceived);
+}
+
+void UnityApiClient::fetchBuilds(const BuildTarget &buildTarget)
+{
+    auto project = ProjectDao(ServiceLocator::database()).project(buildTarget.projectId());
+    auto apiKey = ProfileDao(ServiceLocator::database()).getApiKey(project.profileId());
+    auto orgId = project.organisationId();
+    auto projectId = project.cloudId();
+    auto buildTargetId = buildTarget.cloudId();
+    QNetworkRequest request(QUrl{API("/orgs/%1/projects/%2/buildtargets/%3/builds").arg(orgId, projectId, buildTargetId)});
+    setAuthorization(request, apiKey);
+
+    auto *reply = m_networkManager->get(request);
+    reply->setProperty("buildTarget", QVariant::fromValue(buildTarget));
     connect(reply, &QNetworkReply::finished, this, &UnityApiClient::buildsReceived);
 }
 
@@ -103,6 +143,11 @@ void UnityApiClient::projectsReceived()
     reply->deleteLater();
     QVector<Project> projects;
 
+    auto profileProperty = reply->property("profile");
+    QUuid profileId;
+    if (profileProperty.isValid())
+        profileId = profileProperty.value<Profile>().uuid();
+
     if (reply->error() == 0)
     {
         auto replyData = reply->readAll();
@@ -115,6 +160,7 @@ void UnityApiClient::projectsReceived()
 
             Project project;
             project.setName(value["name"].toString());
+            project.setProfileId(profileId);
             project.setCloudId(value["projectid"].toString());
             project.setOrganisationId(value["orgid"].toString());
             project.setIconPath(value["cachedIcon"].toString());
@@ -132,6 +178,11 @@ void UnityApiClient::buildTargetsReceived()
     reply->deleteLater();
     QVector<BuildTarget> buildTargets;
 
+    auto projectProperty = reply->property("project");
+    QUuid projectId;
+    if (projectProperty.isValid())
+        projectId = projectProperty.value<Project>().id();
+
     if (reply->error() == 0)
     {
         auto replyData = reply->readAll();
@@ -141,6 +192,7 @@ void UnityApiClient::buildTargetsReceived()
         {
             BuildTarget buildTarget;
             buildTarget.setName(value["name"].toString());
+            buildTarget.setProjectId(projectId);
             buildTarget.setCloudId(value["buildtargetid"].toString());
             buildTarget.setPlatform(value["platform"].toString());
 
@@ -157,6 +209,11 @@ void UnityApiClient::buildsReceived()
     reply->deleteLater();
     QVector<Build> builds;
 
+    auto buildTargetProperty = reply->property("buildTarget");
+    QUuid buildTargetId;
+    if (buildTargetProperty.isValid())
+        buildTargetId = buildTargetProperty.value<BuildTarget>().id();
+
     if (reply->error() == 0)
     {
         auto replyData = reply->readAll();
@@ -166,6 +223,7 @@ void UnityApiClient::buildsReceived()
         {
             Build build;
             build.setId(value["build"].toInt());
+            build.setBuildTargetId(buildTargetId);
             build.setName(value["buildTargetName"].toString());
             build.setStatus(Build::statusFromString(value["buildStatus"].toString()));
             build.setCreateTime(value["created"].toVariant().toDateTime());

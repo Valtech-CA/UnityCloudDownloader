@@ -1,5 +1,7 @@
-#ifndef BUILDTARGETDAO_H
-#define BUILDTARGETDAO_H
+#ifndef UCD_BUILDTARGETDAO_H
+#define UCD_BUILDTARGETDAO_H
+
+#pragma once
 
 #include <QVector>
 #include <QSqlDatabase>
@@ -35,4 +37,4 @@ private:
 
 }
 
-#endif // BUILDTARGETDAO_H
+#endif // UCD_BUILDTARGETDAO_H

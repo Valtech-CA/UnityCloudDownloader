@@ -16,6 +16,11 @@ class QNetworkAccessManager;
 namespace ucd
 {
 
+class Profile;
+class Project;
+class BuildTarget;
+class Build;
+
 class UCD_SHARED_EXPORT UnityApiClient : public QObject
 {
     Q_OBJECT
@@ -31,8 +36,11 @@ public:
     Q_INVOKABLE void testKey(const QString &apiKey);
 
     Q_INVOKABLE void fetchProjects();
+    Q_INVOKABLE void fetchProjects(const Profile &profile);
     Q_INVOKABLE void fetchBuildTargets(const QString &orgId, const QString &projectId);
+    Q_INVOKABLE void fetchBuildTargets(const Project &project);
     Q_INVOKABLE void fetchBuilds(const QString &orgId, const QString &porjectId, const QString &buildTargetId);
+    Q_INVOKABLE void fetchBuilds(const BuildTarget &buildTarget);
 
     static void preconnect();
 

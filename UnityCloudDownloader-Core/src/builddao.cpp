@@ -11,9 +11,7 @@ namespace ucd
 
 BuildDao::BuildDao(const QSqlDatabase &database)
     : m_db(database)
-{
-
-}
+{}
 
 void BuildDao::init()
 {
@@ -32,7 +30,7 @@ void BuildDao::init()
                "PRIMARY KEY(buildNumber, buildTargetId))"))
     {
         auto error = query.lastError().text().toUtf8();
-        qFatal(error);
+        qFatal("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -60,7 +58,7 @@ void BuildDao::addBuild(const Build &build)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -88,7 +86,33 @@ void BuildDao::updateBuild(const Build &build)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
+        throw std::runtime_error(error);
+    }
+}
+
+void BuildDao::partialUpdate(const Build &build)
+{
+    QSqlQuery query(m_db);
+    query.prepare("UPDATE Builds SET "
+                  "status = :status, "
+                  "iconPath = :iconPath, "
+                  "artifactName = :artifactName, "
+                  "artifactSize = :artifactSize, "
+                  "artifactPath = :artifactPath "
+                  "WHERE buildNumber = :buildNumber "
+                  "AND buildTargetId = :buildTargetId");
+    query.bindValue(":status", build.status());
+    query.bindValue(":iconPath", build.iconPath());
+    query.bindValue(":artifactName", build.artifactName());
+    query.bindValue(":artifactSize", build.artifactSize());
+    query.bindValue(":artifactPath", build.artifactPath());
+    query.bindValue(":buildNumber", build.id());
+    query.bindValue(":buildTargetId", build.buildTargetId().toString());
+    if (!query.exec())
+    {
+        auto error = query.lastError().text().toUtf8();
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -104,7 +128,7 @@ void BuildDao::removeBuild(const Build &build)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 }
@@ -152,7 +176,7 @@ Build BuildDao::build(const QUuid &buildTargetId, int buildNumber)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
     else if (query.next())
@@ -180,7 +204,7 @@ void BuildDao::removeBuilds(const QUuid &buildTargetId)
     if (!query.exec())
     {
         auto error = query.lastError().text().toUtf8();
-        qCritical(error);
+        qCritical("%s", error.data());
         throw std::runtime_error(error);
     }
 }

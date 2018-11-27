@@ -19,6 +19,11 @@ BuildRef::BuildRef(const Build &build)
     , m_buildNumber(build.id())
 {}
 
+BuildRef::BuildRef(QUuid buildTargetId, int buildNumber)
+    : m_buildTargetId(buildTargetId)
+    , m_buildNumber(buildNumber)
+{}
+
 BuildRef &BuildRef::operator=(const Build &build)
 {
     m_buildTargetId = build.buildTargetId();

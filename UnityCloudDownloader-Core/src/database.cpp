@@ -4,6 +4,7 @@
 #include "projectdao.h"
 #include "buildtargetdao.h"
 #include "builddao.h"
+#include "downloadsdao.h"
 
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -49,6 +50,7 @@ void Database::init()
     ProjectDao(database).init();
     BuildTargetDao(database).init();
     BuildDao(database).init();
+    DownloadsDao(database).init();
 }
 
 bool Database::hasProfiles() const

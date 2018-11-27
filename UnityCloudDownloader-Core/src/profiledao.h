@@ -1,6 +1,8 @@
 #ifndef UCD_PROFILEDAO_H
 #define UCD_PROFILEDAO_H
 
+#pragma once
+
 #include <QVector>
 #include <QSqlDatabase>
 

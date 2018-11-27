@@ -66,7 +66,7 @@ bool BuildsModel::updateBuild(int row, const Build &build)
 
     currentBuild.takeFrom(build);
 
-    BuildDao(ServiceLocator::database()).updateBuild(currentBuild);
+    BuildDao(ServiceLocator::database()).partialUpdate(currentBuild);
     emit dataChanged(index(row), index(row));
     return true;
 }
