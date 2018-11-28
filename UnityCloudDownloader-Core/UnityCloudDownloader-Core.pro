@@ -11,6 +11,10 @@ QT       -= gui
 TARGET = UnityCloudDownloader-Core
 TEMPLATE = lib
 
+win32 {
+#VERSION = 0.9.0.0
+}
+
 DEFINES += UCD_CORE_LIBRARY
 
 # The following define makes your compiler emit warnings if you use
@@ -129,7 +133,7 @@ CONFIG( debug, debug|release ) {
         DEPLOY_TARGET = $$shell_quote($$shell_path($${DESTDIR}))
 
         win32 {
-                QMAKE_POST_LINK += if defined CERTPWD \"$$PWD/../external/signtool.exe\" sign /fd SHA256 /f \"$$PWD/../code_cert.pfx\" /p \"%CERTPWD%\" /t \"http://timestamp.verisign.com/scripts/timstamp.dll\" \"$$DESTDIR$$TARGET$$TARGET_CUSTOM_EXT\" || ECHO SignTool failed with return code %ERRORLEVEL% $$escape_expand(\n\t)
+                QMAKE_POST_LINK += if defined CERTPWD \"$$PWD/../external/signtool.exe\" sign /fd SHA256 /f \"%CERTPATH%\" /p \"%CERTPWD%\" /t \"http://timestamp.verisign.com/scripts/timstamp.dll\" \"$$DESTDIR$$TARGET$$TARGET_CUSTOM_EXT\" || ECHO SignTool failed with return code %ERRORLEVEL% $$escape_expand(\n\t)
                 warning($$QMAKE_POST_LINK)
         }
 }

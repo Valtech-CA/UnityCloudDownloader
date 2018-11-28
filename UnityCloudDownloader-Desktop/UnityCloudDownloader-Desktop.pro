@@ -11,7 +11,15 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = UnityCloudDownloader
 TEMPLATE = app
 
-win32:RC_FILE = UnityCloudDownloader.rc
+win32 {
+VERSION = 0.9.0.0
+RC_ICONS = icons/unitycloudlogo.ico
+QMAKE_TARGET_COMPANY = Valtech
+QMAKE_TARGET_DESCRIPTION = Unity Cloud Downloader
+QMAKE_TARGET_COPYRIGHT = Copyright 2018 by Valtech
+QMAKE_TARGET_PRODUCT = Unity Cloud Downloader
+RC_CODEPAGE = 65001
+}
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -55,6 +63,8 @@ else:unix: LIBS += -L$$OUT_PWD/../UnityCloudDownloader-Core/ -lUnityCloudDownloa
 INCLUDEPATH += $$PWD/../UnityCloudDownloader-Core/includes
 DEPENDPATH += $$PWD/../UnityCloudDownloader-Core
 
+QT_PATH = $$dirname(QMAKE_QMAKE)
+
 win32 {
         TEMPDIR  = $$OUT_PWD/tmp/win32/$$TARGET
         MOC_DIR      = $$TEMPDIR
@@ -84,10 +94,10 @@ isEmpty(TARGET_EXT) {
 }
 
 win32 {
-    DEPLOY_COMMAND = windeployqt
+    DEPLOY_COMMAND = $${QT_PATH}/windeployqt
 }
 macx {
-    DEPLOY_COMMAND = macdeployqt
+    DEPLOY_COMMAND = $${QT_PATH}/macdeployqt
 }
 
 CONFIG( debug, debug|release ) {
@@ -102,10 +112,9 @@ CONFIG( debug, debug|release ) {
     DEPLOY_TARGET = $$shell_quote($$shell_path($${DESTDIR}))
 
     win32 {
-        QMAKE_POST_LINK += if defined CERTPWD \"$$PWD/../external/signtool.exe\" sign /fd SHA256 /f \"$$PWD/../code_cert.pfx\" /p \"%CERTPWD%\" /t \"http://timestamp.verisign.com/scripts/timstamp.dll\" \"$$DESTDIR$$TARGET$$TARGET_CUSTOM_EXT\" || ECHO SignTool failed with return code %ERRORLEVEL% $$escape_expand(\n\t)
+        QMAKE_POST_LINK += if defined CERTPWD \"$$PWD/../external/signtool.exe\" sign /fd SHA256 /f \"%CERTPATH%\" /p \"%CERTPWD%\" /t \"http://timestamp.verisign.com/scripts/timstamp.dll\" \"$$DESTDIR$$TARGET$$TARGET_CUSTOM_EXT\" || ECHO SignTool failed with return code %ERRORLEVEL% $$escape_expand(\n\t)
         warning($$QMAKE_POST_LINK)
     }
 }
 
-
-#QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+QMAKE_POST_LINK += $${DEPLOY_COMMAND} -sql $${DEPLOY_TARGET} --qmldir \"$$PWD/views\"
