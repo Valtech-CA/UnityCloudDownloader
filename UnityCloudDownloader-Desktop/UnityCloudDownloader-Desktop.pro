@@ -29,11 +29,13 @@ CONFIG += c++14 qtquickcompiler
 SOURCES += \
     src/main.cpp \
     src/systemtrayicon.cpp \
-    src/qmlcontext.cpp
+    src/qmlcontext.cpp \
+    src/logmanager.cpp
 
 HEADERS += \
     src/systemtrayicon.h \
-    src/qmlcontext.h
+    src/qmlcontext.h \
+    src/logmanager.h
 
 FORMS +=
 

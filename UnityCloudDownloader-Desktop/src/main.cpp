@@ -3,14 +3,13 @@
 #include "unityclouddownloadercore.h"
 #include "servicelocator.h"
 #include "idatabaseprovider.h"
+#include "logmanager.h"
 
 #include <QApplication>
 #include <QSystemTrayIcon>
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QDir>
-
-#include <QDebug>
 
 int main(int argc, char *argv[])
 {
@@ -19,6 +18,15 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("valtech.com");
     QCoreApplication::setApplicationName("UnityCloudDownloader");
 
+    auto configPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QDir configDir(configPath);
+    if (!configDir.exists())
+    {
+        configDir.mkpath(configPath);
+    }
+
+    LogManagerGuard logManagerGuard(configDir.filePath("logs"));
+    Q_UNUSED(logManagerGuard);
     QApplication a(argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
 
@@ -31,12 +39,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    auto configPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QDir configDir(configPath);
-    if (!configDir.exists())
-    {
-        configDir.mkpath(configPath);
-    }
     ucd::Core::init(configPath, &a);
 
     SystemTrayIcon trayIcon;
