@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?define SOURCE_BUILD_DIR="$(sys.SOURCEFILEDIR)/../build/"?>
+<?define ProductVersion=!(bind.FileVersion.UnityCloudDownloader)?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+  <Product Id="*" Name="Unity Cloud Downloader" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Valtech" UpgradeCode="{C5A1445A-864B-433F-9FEA-BD1803657D47}">
+    <Package InstallerVersion="301" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated" />
+
+    <WixVariable Id="SourceDir" Value="$(var.SOURCE_BUILD_DIR)"/>
+
+    <MajorUpgrade AllowSameVersionUpgrades="yes" Schedule="afterInstallExecute" DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="UnityCloudDownloader" Title="Unity Cloud Downloader" Level="1" ConfigurableDirectory="APPLICATIONFOLDER">
+      <ComponentGroupRef Id="ProductComponents" />
+      <Feature Id="AutoStart" Title="Start application on login" Level="1">
+        <ComponentRef Id="AutoStart"/>
+      </Feature>
+      <Feature Id="VCRefist" Title="Visual C++ 2017 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+        <MergeRef Id="VCRedist"/>
+      </Feature>
+    </Feature>
+
+    <util:CloseApplication Id="CloseUCD" CloseMessage="yes" ElevatedCloseMessage="yes" RebootPrompt="no" TerminateProcess="1" Target="UnityCloudDownloader.exe" />
+
+    <Property Id="ApplicationFolderName" Value="Unity Cloud Downloader"/>
+    <Property Id="WixAppFolder" Value="WixPerMachineFolder"/>
+    <Property Id="WixUISupportPerUser" Value="0" />
+    <Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONFOLDER"/>
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch Unity Cloud Downloader"/>
+    <UI>
+      <UIRef Id="WixUI_FeatureTree"/>
+      <DialogRef Id="FilesInUse"/>
+      <DialogRef Id="MsiRMFilesInUse"/>
+      <DialogRef Id="InvalidDirDlg"/>
+      <DialogRef Id="InstallDirDlg"/>
+      <!-- skip license dialog -->
+      <Publish Dialog="WelcomeDlg"
+               Control="Next"
+               Event="NewDialog"
+               Value="InstallDirDlg"
+               Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg"
+               Control="Back"
+               Event="NewDialog"
+               Value="WelcomeDlg"
+               Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg"
+               Control="Next"
+               Event="NewDialog"
+               Value="CustomizeDlg"
+               Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg"
+               Control="ChangeFolder"
+               Event="SpawnDialog"
+               Value="BrowseDlg"
+               Order="2">1</Publish>
+      <!-- show option to launch app on exit -->
+      <Publish Dialog="ExitDialog"
+               Control="Finish"
+               Event="DoAction"
+               Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+    </UI>
+
+    <Property Id="WixShellExecTarget" Value="[#UnityCloudDownloader]"/>
+    <CustomAction Id="LaunchApplication"
+                  BinaryKey="WixCA"
+                  DllEntry="WixShellExec"
+                  Impersonate="yes" />
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="APPLICATIONFOLDER" Name="Unity Cloud Downloader" />
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="Unity Cloud Downloader" />
+      </Directory>
+      <Directory Id="DesktopFolder" />
+    </Directory>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="{7C93ED09-68B1-4FB0-8E30-028525864FF5}">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="Unity Cloud Downloader"
+                  Description="Unity Cloud Downloader"
+                  Target="[#UnityCloudDownloader]"
+                  WorkingDirectory="APPLICATIONFOLDER"/>
+        <Shortcut Id="UninstallProductShortcut"
+                  Name="Uninstall Unity Cloud Downloader"
+                  Target="[SystemFolder]msiexec.exe"
+                  Arguments="/x [ProductCode]"
+                  Description="Uninstall Unity Cloud Downloader"/>
+        <RemoveFolder Id="CleanupShortcut" Directory="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\UnityCloudDownloader" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+    <DirectoryRef Id="APPLICATIONFOLDER">
+      <Merge Id="VCRedist" SourceFile="Microsoft_VC141_CRT_x64.msm" DiskId="1" Language="0"/>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="APPLICATIONFOLDER">
+      <Component Id="UnityCloudDownloader">
+        <File Id="UnityCloudDownloader" Source="$(var.SOURCE_BUILD_DIR)UnityCloudDownloader.exe" KeyPath="yes"/>
+        <Shortcut Id="DesktopShortcut"
+                  Advertise="yes"
+                  Name="Unity Cloud Downloader"
+                  Description="Unity Cloud Downloader"
+                  Directory="DesktopFolder"
+                  Icon="app.exe"
+                  IconIndex="0"
+                  WorkingDirectory="InstallFolder">
+          <Icon Id="app.exe" SourceFile="$(var.SOURCE_BUILD_DIR)UnityCloudDownloader.exe"/>
+        </Shortcut>
+      </Component>
+      <ComponentRef Id="ApplicationShortcut"/>
+      <ComponentGroupRef Id="AppDeployment"/>
+    </ComponentGroup>
+    <Component Id="AutoStart" Directory="APPLICATIONFOLDER">
+      <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="UnityCloudDownloader" Type="string" Value="&quot;[APPLICATIONFOLDER]UnityCloudDownloader.exe&quot;" KeyPath="yes" />
+    </Component>
+  </Fragment>
+</Wix>
