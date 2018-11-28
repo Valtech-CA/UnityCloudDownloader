@@ -96,7 +96,7 @@ void LogManager::logToFile(const char *category, const QMessageLogContext &conte
             stream << ", " << context.function;
         stream << "): " << message;
         stream.flush();
-        std::cerr << s_messageBuffer.data() << std::endl;
+        std::clog << s_messageBuffer.data() << std::endl;
         stream << ENDMSG;
     }
     m_file->write(s_messageBuffer.data(), buffer.size());
