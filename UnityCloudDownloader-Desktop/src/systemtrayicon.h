@@ -24,6 +24,7 @@ private slots:
     void onRefresh();
     void onDownloadCompleted(ucd::Build build);
     void onMessageClicked();
+    void onActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
     QMenu *m_menu;

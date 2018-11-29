@@ -50,6 +50,7 @@ SystemTrayIcon::SystemTrayIcon(QObject *parent)
     connect(synchronizer, &ucd::AbstractSynchronizer::downloadCompleted, this, &SystemTrayIcon::onDownloadCompleted);
 
     connect(this, &QSystemTrayIcon::messageClicked, this, &SystemTrayIcon::onMessageClicked);
+    connect(this, &QSystemTrayIcon::activated, this, &SystemTrayIcon::onActivated);
 }
 
 void SystemTrayIcon::configure()
@@ -77,6 +78,8 @@ void SystemTrayIcon::onConfigure()
     else
     {
         m_window->show();
+        m_window->requestActivate();
+        m_window->raise();
     }
 }
 
@@ -95,4 +98,10 @@ void SystemTrayIcon::onMessageClicked()
 {
     auto dirPath = ucd::Build(m_lastBuildDownloaded).downloadFolderPath();
     QDesktopServices::openUrl(QUrl::fromLocalFile(dirPath));
+}
+
+void SystemTrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    if (reason == QSystemTrayIcon::DoubleClick)
+        configure();
 }

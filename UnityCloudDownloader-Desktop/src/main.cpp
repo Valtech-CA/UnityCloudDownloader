@@ -4,6 +4,7 @@
 #include "servicelocator.h"
 #include "idatabaseprovider.h"
 #include "logmanager.h"
+#include "runguard.h"
 
 #include <QApplication>
 #include <QSystemTrayIcon>
@@ -18,14 +19,13 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("valtech.com");
     QCoreApplication::setApplicationName("UnityCloudDownloader");
 
-    auto configPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QDir configDir(configPath);
-    if (!configDir.exists())
-    {
-        configDir.mkpath(configPath);
-    }
+    RunGuard runGuard(QStringLiteral("{6A26DD45-7CB9-4168-82CD-3D1C5305D582}"));
+    if (!runGuard.tryLock())
+        return 0;
 
-    LogManagerGuard logManagerGuard(configDir.filePath("logs"));
+    auto localPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    QDir localDir(localPath);
+    LogManagerGuard logManagerGuard(localDir.filePath("logs"));
     Q_UNUSED(logManagerGuard);
     QApplication a(argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
@@ -39,15 +39,24 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    auto configPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QDir configDir(configPath);
+    if (!configDir.exists())
+    {
+        configDir.mkpath(configPath);
+    }
     ucd::Core::init(configPath, &a);
 
     SystemTrayIcon trayIcon;
     trayIcon.show();
+
+    QObject::connect(&runGuard, &RunGuard::triggered, &trayIcon, &SystemTrayIcon::configure);
 
     if (!ucd::ServiceLocator::databaseProvider()->hasProfiles())
     {
         trayIcon.configure();
     }
 
+    runGuard.startWatch();
     return a.exec();
 }

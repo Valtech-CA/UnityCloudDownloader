@@ -10,6 +10,7 @@ res/
 */debug/
 */release/
 TODO.md
+*_qmlcache.qrc
 
 # vim/neovim / YouCompleteMe
 .vimrc

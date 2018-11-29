@@ -38,12 +38,14 @@ SOURCES += \
     src/main.cpp \
     src/systemtrayicon.cpp \
     src/qmlcontext.cpp \
-    src/logmanager.cpp
+    src/logmanager.cpp \
+    src/runguard.cpp
 
 HEADERS += \
     src/systemtrayicon.h \
     src/qmlcontext.h \
-    src/logmanager.h
+    src/logmanager.h \
+    src/runguard.h
 
 FORMS +=
 
