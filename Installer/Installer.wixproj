@@ -7,7 +7,7 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>a4266290-2f2f-407d-b57e-8f1410d580fb</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>UnityCloudDownloaderInstaller</OutputName>
+    <OutputName>UnityCloudDownloader</OutputName>
     <OutputType>Package</OutputType>
     <HarvestDirectoryNoLogo>true</HarvestDirectoryNoLogo>
     <HarvestDirectoryAutogenerateGuids>false</HarvestDirectoryAutogenerateGuids>
@@ -21,7 +21,7 @@
     <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <OutputPath>..\build\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
@@ -41,10 +41,11 @@
     </WixExtension>
     <HarvestDirectory Include="../build">
       <ComponentGroupName>AppGroup</ComponentGroupName>
-      <DirectoryRefId>AppFolder</DirectoryRefId>
-      <PreprocessorVariable>wix.AppSourceDir</PreprocessorVariable>
+      <DirectoryRefId>APPLICATIONFOLDER</DirectoryRefId>
+      <PreprocessorVariable>wix.SourceDir</PreprocessorVariable>
       <SuppressRootDirectory>true</SuppressRootDirectory>
       <SuppressCom>true</SuppressCom>
+      <Transforms>Filter.xslt</Transforms>
     </HarvestDirectory>
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />

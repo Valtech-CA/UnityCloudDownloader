@@ -116,7 +116,7 @@
         </Shortcut>
       </Component>
       <ComponentRef Id="ApplicationShortcut"/>
-      <ComponentGroupRef Id="AppDeployment"/>
+      <ComponentGroupRef Id="AppGroup"/>
     </ComponentGroup>
     <Component Id="AutoStart" Directory="APPLICATIONFOLDER">
       <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="UnityCloudDownloader" Type="string" Value="&quot;[APPLICATIONFOLDER]UnityCloudDownloader.exe&quot;" KeyPath="yes" />

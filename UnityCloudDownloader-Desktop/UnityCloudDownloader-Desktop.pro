@@ -118,7 +118,7 @@ CONFIG( debug, debug|release ) {
 
     win32 {
         QMAKE_POST_LINK += if defined CERTPWD \"$$PWD/../external/signtool.exe\" sign /fd SHA256 /f \"%CERTPATH%\" /p \"%CERTPWD%\" /t \"http://timestamp.verisign.com/scripts/timstamp.dll\" \"$$DESTDIR$$TARGET$$TARGET_CUSTOM_EXT\" || ECHO SignTool failed with return code %ERRORLEVEL% $$escape_expand(\n\t)
-        warning($$QMAKE_POST_LINK)
+        #warning($$QMAKE_POST_LINK)
     }
 }
 
@@ -129,5 +129,17 @@ QMAKE_BUNDLE_DATA += extraframeworks
 QMAKE_POST_LINK += install_name_tool -change libUnityCloudDownloader-Core.1.dylib @executable_path/libUnityCloudDownloader-Core.dylib $${DEPLOY_TARGET}$${TARGET}.app/Contents/MacOS/$$TARGET &&
 }
 
-win32: QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -sql --qmldir \"$$PWD/views\"
+win32 {
+libeay.target = libeay32.dll
+libeay.commands = $(COPY_FILE) \"$$shell_path($$PWD/../external/OpenSSL/libeay32.dll)\" $$DEPLOY_TARGET
+ssleay.target = ssleay32.dll
+ssleay.commands = $(COPY_FILE) \"$$shell_path($$PWD/../external/OpenSSL/ssleay32.dll)\" $$DEPLOY_TARGET
+ssllicense.target = "OpenSSL License.txt"
+ssllicense.commands = $(COPY_FILE) \"$$shell_path($$PWD/../external/OpenSSL/OpenSSL License.txt)\" $$DEPLOY_TARGET
+openssl.depends = libeay ssleay ssllicense
+first.depends = $(first) openssl
+QMAKE_EXTRA_TARGETS += first openssl libeay ssleay ssllicense
+}
+
+win32: QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -sql --qmldir \"$$PWD/views\" --no-compiler-runtime
 macx: QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}$${TARGET}.app -qmldir=\"$$PWD/views\" -dmg

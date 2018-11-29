@@ -10,6 +10,8 @@ xmlns:wix="http://schemas.microsoft.com/wix/2006/wi">
     </xsl:copy>
   </xsl:template>
   <xsl:key name="service-search" match="wix:Component[contains(wix:File/@Source, '.pdb')]" use="@Id" />
+  <xsl:key name="service-search" match="wix:Component[contains(wix:File/@Source, '.lib')]" use="@Id" />
+  <xsl:key name="service-search" match="wix:Component[contains(wix:File/@Source, '.exp')]" use="@Id" />
   <xsl:key name="service-search" match="wix:Component[contains(wix:File/@Source, '.xml')]" use="@Id" />
   <xsl:key name="service-search" match="wix:Component[contains(wix:File/@Source, '.log')]" use="@Id" />
   <xsl:key name="service-search" match="wix:Component[contains(wix:File/@Source, '.log.*')]" use="@Id "/>
@@ -18,8 +20,7 @@ xmlns:wix="http://schemas.microsoft.com/wix/2006/wi">
   <xsl:key name="service-search" match="wix:Component[contains(wix:File/@Source, '.vshost.exe')]" use="@Id" />
   <xsl:key name="service-search" match="wix:Component[contains(wix:File/@Source, 'app.confing')]" use="@Id" />
   <xsl:key name="service-search" match="wix:Component[contains(wix:File/@Source, '.local.config')]" use="@Id" />
-  <xsl:key name="service-search" match="wix:Component[contains(wix:File/@Source, 'MultiScreenPlayer.exe')]" use="@Id" />
-  <xsl:key name="service-search" match="wix:Component[contains(wix:File/@Source, 'vcredist_x64.exe')]" use="@Id" />
+  <xsl:key name="service-search" match="wix:Component[contains(wix:File/@Source, 'UnityCloudDownloader.exe')]" use="@Id" />
   <xsl:template match="wix:Component[key('service-search', @Id)]" />
   <xsl:template match="wix:ComponentRef[key('service-search', @Id)]" />
 </xsl:stylesheet>
