@@ -93,7 +93,6 @@ bool RunGuard::tryLock()
         return false;
     }
 
-    m_timerId = startTimer(ReadInterval);
     return true;
 }
 

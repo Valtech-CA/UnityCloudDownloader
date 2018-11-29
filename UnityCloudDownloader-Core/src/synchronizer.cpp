@@ -34,7 +34,7 @@ enum
 
 Synchronizer::Synchronizer(QObject *parent)
     : AbstractSynchronizer(parent)
-    , m_workerThreads{}
+    , m_workerThread(new QThread(this))
     , m_workers{}
     , m_apiClient(nullptr)
     , m_updateTimer(0)
@@ -46,14 +46,13 @@ Synchronizer::Synchronizer(QObject *parent)
     m_progressTick = startTimer(ProgressInterval);
     for (int i = 0; i < WorkerCount; ++i)
     {
-        m_workerThreads[i] = new QThread(this);
         m_workers[i] = new DownloadWorker();
-        m_workers[i]->moveToThread(m_workerThreads[i]);
+        m_workers[i]->moveToThread(m_workerThread);
         connect(m_workers[i], &DownloadWorker::downloadCompleted, this, &Synchronizer::onDownloadCompleted, Qt::QueuedConnection);
         connect(m_workers[i], &DownloadWorker::downloadFailed, this, &Synchronizer::onDownloadFailed, Qt::QueuedConnection);
         connect(m_workers[i], &DownloadWorker::downloadUpdated, this, &Synchronizer::onDownloadUpdated, Qt::QueuedConnection);
-        m_workerThreads[i]->start();
     }
+    m_workerThread->start();
 
     auto downloads = DownloadsDao(ServiceLocator::database()).downloadedBuilds();
     std::sort(std::begin(downloads), std::end(downloads));
@@ -64,18 +63,12 @@ Synchronizer::~Synchronizer()
 {
     killTimer(m_updateTimer);
     killTimer(m_progressTick);
-    for (QThread *thread : m_workerThreads)
+    m_workerThread->requestInterruption();
+    m_workerThread->quit();
+    if (!m_workerThread->wait(ThreadJoinTimout))
     {
-        thread->requestInterruption();
-    }
-    for (QThread *thread : m_workerThreads)
-    {
-        thread->quit();
-        if (!thread->wait(ThreadJoinTimout))
-        {
-            qCritical("Worker thread not ending nicely");
-            thread->terminate();
-        }
+        qCritical("Worker thread not ending nicely");
+        m_workerThread->terminate();
     }
 }
 

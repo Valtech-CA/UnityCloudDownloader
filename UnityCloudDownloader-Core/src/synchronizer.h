@@ -26,7 +26,7 @@ class Synchronizer : public AbstractSynchronizer
 {
     enum
     {
-        WorkerCount = 3
+        WorkerCount = 4
     };
     Q_OBJECT
 public:
@@ -61,7 +61,7 @@ private:
     QVector<BuildRef> m_processingBuilds;
     QVector<BuildRef> m_queuedBuilds;
     QVector<BuildRef> m_downloadedBuilds;
-    QThread *m_workerThreads[WorkerCount];
+    QThread *m_workerThread;
     DownloadWorker *m_workers[WorkerCount];
     QMap<BuildRef, QPair<float, qint64>> m_downloadStats;
     UnityApiClient *m_apiClient;
