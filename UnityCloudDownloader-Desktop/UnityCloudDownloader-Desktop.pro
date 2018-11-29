@@ -12,7 +12,7 @@ TARGET = UnityCloudDownloader
 TEMPLATE = app
 
 win32 {
-VERSION = 0.9.0.0
+VERSION = 1.0.0.0
 RC_ICONS = icons/unitycloudlogo.ico
 QMAKE_TARGET_COMPANY = Valtech
 QMAKE_TARGET_DESCRIPTION = Unity Cloud Downloader
@@ -129,6 +129,7 @@ extraframeworks.files = $$DESTDIR/libUnityCloudDownloader-Core.dylib
 extraframeworks.path = Contents/MacOS
 QMAKE_BUNDLE_DATA += extraframeworks
 QMAKE_POST_LINK += install_name_tool -change libUnityCloudDownloader-Core.1.dylib @executable_path/libUnityCloudDownloader-Core.dylib $${DEPLOY_TARGET}$${TARGET}.app/Contents/MacOS/$$TARGET &&
+ICON = $$PWD/icons/unitycloudlogo.icns
 }
 
 win32 {

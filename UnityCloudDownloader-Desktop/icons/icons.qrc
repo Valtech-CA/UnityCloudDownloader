@@ -9,5 +9,7 @@
         <file>UnityCloudLogo2.png</file>
         <file>UnityCloudLogo2.svg</file>
         <file>angle_right.svg</file>
+        <file>logo-dark.png</file>
+        <file>logo-light.png</file>
     </qresource>
 </RCC>

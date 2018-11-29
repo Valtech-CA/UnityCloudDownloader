@@ -44,7 +44,7 @@ SystemTrayIcon::SystemTrayIcon(QObject *parent)
 
     setContextMenu(m_menu);
     setToolTip(tr("Unity Cloud Downloader"));
-    setIcon(QIcon(":/icons/UnityCloudLogo2.png"));
+    setIcon(QIcon(":/icons/logo-light.png"));
 
     auto synchronizer = ucd::ServiceLocator::synchronizer();
     connect(synchronizer, &ucd::AbstractSynchronizer::downloadCompleted, this, &SystemTrayIcon::onDownloadCompleted);
