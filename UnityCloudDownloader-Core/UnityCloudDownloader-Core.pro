@@ -10,10 +10,13 @@ QT       -= gui
 
 TARGET = UnityCloudDownloader-Core
 TEMPLATE = lib
+#macx:CONFIG += lib_bundle
 
 win32 {
 #VERSION = 0.9.0.0
 }
+
+macx: QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../Frameworks
 
 DEFINES += UCD_CORE_LIBRARY
 

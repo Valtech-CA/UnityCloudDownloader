@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui svg quick
+QT       += core gui svg quick sql network concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -60,8 +60,12 @@ win32:CONFIG(release, debug|release): LIBS += -lUnityCloudDownloader-Core
 else:win32:CONFIG(debug, debug|release): LIBS += -lUnityCloudDownloader-Core
 else:unix: LIBS += -L$$OUT_PWD/../UnityCloudDownloader-Core/ -lUnityCloudDownloader-Core
 
+macx: QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../Frameworks
+
 INCLUDEPATH += $$PWD/../UnityCloudDownloader-Core/includes
 DEPENDPATH += $$PWD/../UnityCloudDownloader-Core
+
+#macx: QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../Frameworks
 
 QT_PATH = $$dirname(QMAKE_QMAKE)
 
@@ -81,6 +85,7 @@ CONFIG( debug, debug|release ) {
     DESTDIR = $$PWD/../build/
 }
 LIBS += -L$$DESTDIR
+macx: LIBS += -F$$DESTDIR
 
 isEmpty(TARGET_EXT) {
     win32 {
@@ -117,4 +122,12 @@ CONFIG( debug, debug|release ) {
     }
 }
 
-QMAKE_POST_LINK += $${DEPLOY_COMMAND} -sql $${DEPLOY_TARGET} --qmldir \"$$PWD/views\"
+macx {
+extraframeworks.files = $$DESTDIR/libUnityCloudDownloader-Core.dylib
+extraframeworks.path = Contents/MacOS
+QMAKE_BUNDLE_DATA += extraframeworks
+QMAKE_POST_LINK += install_name_tool -change libUnityCloudDownloader-Core.1.dylib @executable_path/libUnityCloudDownloader-Core.dylib $${DEPLOY_TARGET}$${TARGET}.app/Contents/MacOS/$$TARGET &&
+}
+
+win32: QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -sql --qmldir \"$$PWD/views\"
+macx: QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}$${TARGET}.app -qmldir=\"$$PWD/views\" -dmg
