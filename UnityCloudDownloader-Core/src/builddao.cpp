@@ -35,16 +35,43 @@ void BuildDao::init()
     }
 }
 
-void BuildDao::addBuild(const Build &build)
+bool BuildDao::hasBuild(const Build &build)
+{
+    return hasBuild(BuildRef(build));
+}
+
+bool BuildDao::hasBuild(const BuildRef &buildRef)
 {
     QSqlQuery query(m_db);
-    query.prepare("INSERT INTO Builds ("
-                  "buildNumber, buildTargetId, status, name, "
-                  "createTime, iconPath, artifactName, artifactSize, "
-                  "artifactPath, manualDownload)"
-                  "VALUES (:buildNumber, :buildTargetId, :status, :name, "
-                  ":createTime, :iconPath, :artifactName, :artifactSize, "
-                  ":artifactPath, :manualDownload)");
+    query.prepare("SELECT COUNT(*) WHERE EXISTS(SELECT 1 FROM Builds WHERE "
+                  "buildNumber = :buildNumber "
+                  "AND buildTargetId = :buildTargetId)");
+    query.bindValue(":buildNumber", buildRef.buildNumber());
+    query.bindValue(":buildTargetId", buildRef.buildTargetId().toString());
+    if (!query.exec())
+    {
+        auto error = query.lastError().text().toUtf8();
+        qCritical("%s", error.data());
+        throw std::runtime_error(error);
+    }
+    if (query.next())
+    {
+        return query.value(0).toInt() != 0;
+    }
+    return false;
+}
+
+void BuildDao::addBuild(const Build &build, bool orReplace)
+{
+    QSqlQuery query(m_db);
+    query.prepare(QStringLiteral(
+                          "INSERT %1INTO Builds ("
+                          "buildNumber, buildTargetId, status, name, "
+                          "createTime, iconPath, artifactName, artifactSize, "
+                          "artifactPath, manualDownload)"
+                          "VALUES (:buildNumber, :buildTargetId, :status, :name, "
+                          ":createTime, :iconPath, :artifactName, :artifactSize, "
+                          ":artifactPath, :manualDownload)").arg(orReplace ? QStringLiteral("OR REPLACE ") : QStringLiteral("")));
     query.bindValue(":buildNumber", build.id());
     query.bindValue(":buildTargetId", build.buildTargetId());
     query.bindValue(":status", build.status());

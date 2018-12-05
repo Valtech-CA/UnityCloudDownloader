@@ -12,6 +12,7 @@ namespace ucd
 {
 
 class Build;
+class BuildRef;
 
 class BuildDao
 {
@@ -21,7 +22,10 @@ public:
 
     void init();
 
-    void addBuild(const Build &build);
+    bool hasBuild(const Build& build);
+    bool hasBuild(const BuildRef& buildRef);
+
+    void addBuild(const Build &build, bool orReplace = false);
     void updateBuild(const Build &build);
     void partialUpdate(const Build &build);
     void removeBuild(const Build &build);

@@ -47,7 +47,12 @@ bool BuildRef::operator<(const BuildRef &other) const
 
 BuildRef::operator Build() const
 {
-    return BuildDao(ServiceLocator::database()).build(m_buildTargetId, m_buildNumber);
+    Build build = BuildDao(ServiceLocator::database()).build(m_buildTargetId, m_buildNumber);
+    if (build.id() != m_buildNumber && build.buildTargetId() != m_buildTargetId)
+    {
+        qCritical("could not find build %d in the database", m_buildNumber);
+    }
+    return build;
 }
 
 } // namespace ucd

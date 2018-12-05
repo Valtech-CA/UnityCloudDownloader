@@ -91,7 +91,7 @@ void LogManager::logToFile(const char *category, const QMessageLogContext &conte
     buffer.open(QIODevice::WriteOnly | QIODevice::Truncate);
     {
         QTextStream stream(&buffer);
-        stream << category << " (" << context.file << ":" << context.line;
+        stream << "<" << QDateTime::currentDateTime().toString(Qt::ISODate) << "> " << category << " (" << context.file << ":" << context.line;
         if (context.function != nullptr && context.function[0] == '\0')
             stream << ", " << context.function;
         stream << "): " << message;

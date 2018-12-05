@@ -250,12 +250,22 @@ void Synchronizer::onBuildsFetched(const QVector<Build> &builds)
 
     auto project = ProjectDao(db).project(buildTarget.projectId());
     auto profile = ProfileDao(db).profile(project.profileId());
+    BuildDao buildDao(db);
 
     int buildCount = 0;
 
     for (int i = 0, end = builds.size(); i < end; ++i)
     {
         const Build &build = builds.at(i);
+        if (buildDao.hasBuild(build))
+        {
+            buildDao.partialUpdate(build);
+        }
+        else
+        {
+            buildDao.addBuild(build);
+        }
+
         if (build.status() != Build::Status::Success || build.createTime().daysTo(now) > buildTarget.maxDaysOld())
             continue;
 
