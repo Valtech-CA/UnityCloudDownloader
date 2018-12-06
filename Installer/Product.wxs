@@ -7,7 +7,7 @@
 
     <WixVariable Id="SourceDir" Value="$(var.SOURCE_BUILD_DIR)"/>
 
-    <MajorUpgrade AllowSameVersionUpgrades="yes" Schedule="afterInstallExecute" DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <MediaTemplate EmbedCab="yes" />
 
     <Feature Id="UnityCloudDownloader" Title="Unity Cloud Downloader" Level="1" ConfigurableDirectory="APPLICATIONFOLDER">

@@ -12,7 +12,7 @@ TARGET = UnityCloudDownloader
 TEMPLATE = app
 
 win32 {
-VERSION = 1.0.0.0
+VERSION = 1.0.1.0
 RC_ICONS = icons/unitycloudlogo.ico
 QMAKE_TARGET_COMPANY = Valtech
 QMAKE_TARGET_DESCRIPTION = Unity Cloud Downloader
