@@ -30,6 +30,7 @@ signals:
     void downloadUpdated(ucd::Build build);
     void downloadCompleted(ucd::Build build);
     void downloadFailed(ucd::Build build);
+    void synchronized();
 };
 
 }

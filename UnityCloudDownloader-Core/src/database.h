@@ -8,6 +8,8 @@
 
 #include <QObject>
 
+#include <memory>
+
 class QSqlDatabase;
 
 namespace ucd

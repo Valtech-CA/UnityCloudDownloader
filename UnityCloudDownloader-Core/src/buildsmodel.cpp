@@ -28,6 +28,7 @@ BuildsModel::BuildsModel(QObject *parent)
     connect(synchronizer, &AbstractSynchronizer::downloadUpdated, this, &BuildsModel::updateDownloadProgress);
     connect(synchronizer, &AbstractSynchronizer::downloadCompleted, this, &BuildsModel::updateDownloadStatus);
     connect(synchronizer, &AbstractSynchronizer::downloadFailed, this, &BuildsModel::updateDownloadStatus);
+    connect(synchronizer, &AbstractSynchronizer::synchronized, this, &BuildsModel::onSynchronized);
 }
 
 BuildsModel::~BuildsModel()
@@ -82,10 +83,8 @@ void BuildsModel::addBuild(const Build &build)
     auto index = static_cast<int>(insertIt - std::begin(m_builds));
 
     beginInsertRows(QModelIndex(), index, index);
-    Build newBuild(build);
-    newBuild.setBuildTargetId(m_buildTargetId);
-    BuildDao(ServiceLocator::database()).addBuild(newBuild);
-    m_builds.insert(index, std::move(newBuild));
+    BuildDao(ServiceLocator::database()).addBuild(build);
+    m_builds.insert(index, build);
     endInsertRows();
 }
 
@@ -228,7 +227,7 @@ void BuildsModel::fetchMore(const QModelIndex &parent)
 
     connect(unityClient, &UnityApiClient::buildsFetched, unityClient, &UnityApiClient::deleteLater);
     connect(unityClient, &UnityApiClient::buildsFetched, this, &BuildsModel::onBuildsFetched);
-    unityClient->fetchBuilds(project.organisationId(), project.cloudId(), buildTarget.cloudId());
+    unityClient->fetchBuilds(buildTarget);
 }
 
 void BuildsModel::onBuildsFetched(const QVector<Build> &builds)
@@ -290,7 +289,6 @@ void BuildsModel::updateDownloadStatus(const Build &build)
 
 void BuildsModel::updateDownloadProgress(const Build &build)
 {
-
     auto buildIt = std::find_if(
                        std::begin(m_builds),
                        std::end(m_builds),
@@ -303,6 +301,12 @@ void BuildsModel::updateDownloadProgress(const Build &build)
                                  Roles::DownloadProgress,
                                  Roles::DownloadSpeed});
     }
+}
+
+void BuildsModel::onSynchronized()
+{
+    auto builds = BuildDao(ServiceLocator::database()).builds(m_buildTargetId);
+    onBuildsFetched(builds);
 }
 
 bool BuildsModel::isIndexValid(const QModelIndex &index) const

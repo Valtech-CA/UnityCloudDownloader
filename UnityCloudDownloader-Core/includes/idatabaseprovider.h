@@ -13,7 +13,10 @@ namespace ucd
 class UCD_SHARED_EXPORT IDatabaseProvider
 {
 public:
+    IDatabaseProvider() = default;
     virtual ~IDatabaseProvider() = default;
+    IDatabaseProvider(const IDatabaseProvider&) = delete;
+    IDatabaseProvider& operator=(const IDatabaseProvider&) = delete;
 
     virtual bool hasProfiles() const = 0;
 

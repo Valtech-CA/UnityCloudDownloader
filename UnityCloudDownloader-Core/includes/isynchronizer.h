@@ -13,7 +13,10 @@ class Build;
 class UCD_SHARED_EXPORT ISynchronizer
 {
 public:
+    ISynchronizer() = default;
     virtual ~ISynchronizer() = default;
+    ISynchronizer(const ISynchronizer&) = delete;
+    ISynchronizer& operator=(const ISynchronizer&) = delete;
 
     virtual bool isQueued(const Build &build) const = 0;
     virtual bool isDownloaded(const Build &build) const = 0;

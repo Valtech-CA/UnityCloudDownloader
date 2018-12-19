@@ -53,7 +53,7 @@ private slots:
     void onDownloadCompleted(ucd::Build build);
     void onDownloadFailed(ucd::Build build);
     void onDownloadUpdated(ucd::Build build, float ratio, qint64 speed);
-    void onBuildsFetched(const QVector<Build> &builds);
+    void onBuildsFetched(const QVector<Build> &builds, QUuid buildTargetId);
 
 private:
     void syncTarget(const Profile &profile, const Project &project, const BuildTarget &buildTarget);
@@ -67,6 +67,7 @@ private:
     UnityApiClient *m_apiClient;
     int m_updateTimer;
     int m_progressTick;
+    int m_fetchCounter;
 };
 
 }

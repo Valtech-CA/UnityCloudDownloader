@@ -11,6 +11,8 @@ res/
 */release/
 TODO.md
 *_qmlcache.qrc
+*/GeneratedFiles/*
+.vs/
 
 # vim/neovim / YouCompleteMe
 .vimrc

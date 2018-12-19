@@ -63,6 +63,12 @@ bool BuildDao::hasBuild(const BuildRef &buildRef)
 
 void BuildDao::addBuild(const Build &build, bool orReplace)
 {
+    if (build.buildTargetId().isNull())
+    {
+        const char error[] = "Trying to add a build with a null build target.";
+        qCritical("%s", error);
+        throw std::runtime_error(error);
+    }
     QSqlQuery query(m_db);
     query.prepare(QStringLiteral(
                           "INSERT %1INTO Builds ("

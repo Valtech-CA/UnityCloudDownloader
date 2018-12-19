@@ -257,7 +257,7 @@ void UnityApiClient::buildsReceived()
         }
     }
 
-    emit buildsFetched(builds);
+    emit buildsFetched(builds, buildTargetId);
 }
 
 }

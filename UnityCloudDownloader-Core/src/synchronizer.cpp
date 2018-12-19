@@ -39,6 +39,7 @@ Synchronizer::Synchronizer(QObject *parent)
     , m_apiClient(nullptr)
     , m_updateTimer(0)
     , m_progressTick(0)
+    , m_fetchCounter(0)
 {
     m_apiClient = new UnityApiClient(this);
     connect(m_apiClient, &UnityApiClient::buildsFetched, this, &Synchronizer::onBuildsFetched);
@@ -112,7 +113,10 @@ void Synchronizer::refresh()
             for (const BuildTarget &buildTarget : project.buildTargets())
             {
                 if (buildTarget.sync())
+                {
+                    ++m_fetchCounter;
                     m_apiClient->fetchBuilds(buildTarget);
+                }
                 syncTarget(profile, project, buildTarget);
             }
         }
@@ -230,20 +234,31 @@ void Synchronizer::onDownloadUpdated(Build build, float ratio, qint64 speed)
     emit downloadUpdated(build);
 }
 
-void Synchronizer::onBuildsFetched(const QVector<Build> &builds)
+void Synchronizer::onBuildsFetched(const QVector<Build> &builds, QUuid buildTargetId)
 {
+    auto checkSynchronized = [this]()
+    {
+        if ((--m_fetchCounter) == 0)
+        {
+            emit synchronized();
+        }
+    };
+
     if (builds.isEmpty())
     {
-        qWarning("fetching builds returned empty");
+        checkSynchronized();
+        auto buildTarget = BuildTargetDao(ServiceLocator::database()).buildTarget(buildTargetId);
+        qWarning("fetching builds returned empty (%s)", buildTarget.name().toUtf8().data());
         return;
     }
 
     auto now = QDateTime::currentDateTime();
     auto db = ServiceLocator::database();
-    auto buildTarget = BuildTargetDao(db).buildTarget(builds[0].buildTargetId());
+    auto buildTarget = BuildTargetDao(db).buildTarget(buildTargetId);
 
     if (!buildTarget.sync())
     {
+        checkSynchronized();
         qInfo("synching was disabled since we requested %s", buildTarget.name().toUtf8().data());
         return;
     }
@@ -278,6 +293,8 @@ void Synchronizer::onBuildsFetched(const QVector<Build> &builds)
         if (++buildCount >= buildTarget.maxBuilds())
             break;
     }
+
+    checkSynchronized();
 }
 
 void Synchronizer::syncTarget(const Profile &profile, const Project &project, const BuildTarget &buildTarget)

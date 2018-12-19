@@ -63,6 +63,7 @@ private slots:
     void onBuildsFetched(const QVector<Build> &builds);
     void updateDownloadStatus(const Build &build);
     void updateDownloadProgress(const Build &build);
+    void onSynchronized();
 
 private:
     bool isIndexValid(const QModelIndex &index) const;
