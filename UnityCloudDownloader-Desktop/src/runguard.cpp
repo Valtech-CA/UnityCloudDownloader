@@ -28,11 +28,6 @@ QString generateKeyHash(const QString &key, const QString &salt)
 }
 }
 
-//static QString lockFileName()
-//{
-//    return QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)).filePath("app.lock");
-//}
-
 RunGuard::RunGuard(const QString &key, QObject *parent)
     : QObject(parent)
     , m_key(key)
